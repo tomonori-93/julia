@@ -1,40 +1,53 @@
+# A test script of the Kalman Filter data assimilation system 
+# for a linear oscillation model. 
+# First simulation is for x^t with a true state at the initial.
+#  (This simulation is performed by the perfect model with the Euler scheme).
+# Second simulation is for x^f with a state including small error for x^t, 
+#  but the x^f at certain times are modified by the x^t at the same times 
+#  with the Kalman Filter assimilation. 
+# Third simulation is the same as the second simulation, 
+#  except for no assimilation. 
+
+# Author: Satoki Tsujino
+# Date: 2020/11/01
+# License: LGPL2.1
+
 using PyPlot
 using Random
 using LinearAlgebra
 
 rng = MersenneTwister(1234)
 
-nt = 100000
-nx = 2
-no = 1
+nt = 100000  # Integration steps
+nx = 2  # number of model variable
+no = 1  # number of observation
 n_ascyc = 45000  # assimilation cycle interval for "t"
 rand_flag = false  # observation including random noise
 nto = div(nt,n_ascyc) + 1
 
 # Initializing
-xinit = [1.0, 1.0]
+xinit = [1.0, 1.0]  # Initial condition for the perfect model simulation
 t = zeros(nt)
-t_o = zeros(nto)
-y_o = reshape(zeros(no,nto),no,nto)
-x_t = reshape(zeros(nx,nt),nx,nt)
-x_a = reshape(zeros(nx,nt),nx,nt)  # nx 行 nt 列で定義: x_a[行,列]
-x_an = reshape(zeros(nx),nx,1)  # nx 行 1 列行列へ変換
-x_f = reshape(zeros(nx,nt),nx,nt)
-x_e = reshape(zeros(nx,nt),nx,nt)
-Mop = reshape(zeros(nx,nx),nx,nx)
-Pf = reshape(zeros(nx,nx),nx,nx)
-Pa = reshape(zeros(nx,nx),nx,nx)
-#Ro = reshape(zeros(no,no),no,no)
+t_o = zeros(nto)  # Time for observation
+y_o = reshape(zeros(no,nto),no,nto)  # Observation
+x_t = reshape(zeros(nx,nt),nx,nt)  # x^t (nx x nt array: x_a[arr,col])
+x_a = reshape(zeros(nx,nt),nx,nt)  # Analytical solution for this system
+x_an = reshape(zeros(nx),nx,1)  # Analysis for x^f at a certain time
+x_f = reshape(zeros(nx,nt),nx,nt)  # x^f
+x_e = reshape(zeros(nx,nt),nx,nt)  # x for the third simulation
+Mop = reshape(zeros(nx,nx),nx,nx)  # TLM operator matrix
+Pf = reshape(zeros(nx,nx),nx,nx)  # Background error covariance
+Pa = reshape(zeros(nx,nx),nx,nx)  # Analysis error covariance
 x_prev = reshape(zeros(nx),nx,1)
 x_eprev = reshape(zeros(nx),nx,1)
 x_anprev = reshape(zeros(nx),nx,1)
-Hop = reshape(zeros(no,nx),no,nx)
-Kg = reshape(zeros(nx,no),nx,no)
+Hop = reshape(zeros(no,nx),no,nx)  # Observation operator
+Kg = reshape(zeros(nx,no),nx,no)  # Kalman gain
 Pftime = reshape(zeros(nx,nt),nx,nt)
 
 # Setting parameters
-dt = 0.0001
-k = 40.0
+dt = 0.0001  # Time interval
+k = 40.0  # Oscillation constant
 ksqrt = sqrt(k)
 Pf = fill(1.0,nx,nx)
 Ro = 0.001
@@ -44,8 +57,8 @@ x_f[1:nx,1] = x_t[1:nx,1] + [-0.1, 0.2]
 x_e[1:nx,1] = x_f[1:nx,1]
 Mop = [1.0 dt
        -k*dt 1.0]
-Hop = [1.0 0.0]  # 行ベクトル [a b], 列ベクトル [a, b]
-Pftime[1:nx,1] = diag(Pf)  # 対角成分のみ抽出
+Hop = [1.0 0.0]  # Note: array vector [a b], column vector [a, b]
+Pftime[1:nx,1] = diag(Pf)
 
 for i in 1:nt-1
     if mod(i-1,n_ascyc) == 0  # Entering the analysis processes
