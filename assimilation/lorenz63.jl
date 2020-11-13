@@ -93,7 +93,6 @@ function L63_TL_check(x,deltax,dt,nt,cx,cy,cz)  # The TL check for L63_tangent
 end
 
 # Lorenz (1963) モデルで各時刻に同化・解析処理を挟むシミュレーション
-using PyPlot
 using Random
 using LinearAlgebra
 
@@ -221,6 +220,8 @@ errors = map(x->abs(x), x_f - x_t)
 ##########
 #  Plot  #
 ##########
+using PyPlot
+
 fig = figure("pyplot_majorminor",figsize=(7,5))
 ##p = plot(t[1:nt],x_t[1,1:nt],color="black",label="Perfect")
 ##p = plot(t[1:nt],x_e[1,1:nt],color="blue",label="False")
