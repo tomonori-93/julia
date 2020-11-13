@@ -102,7 +102,7 @@ nt = 1000000
 nx = 3
 no = 3
 n_ascyc = 250000  # assimilation cycle interval for "t"
-rand_flag = false # observation including random noise
+rand_flag = false  # observation including random noise
 nto = div(nt,n_ascyc) + 1
 inf_fact = 1.0  # inflation factor
 eps = 0.0005  # small value for tangential linear matrix of the model operator
@@ -113,14 +113,9 @@ t_o = zeros(nto)
 y_o = reshape(zeros(no,nto),no,nto)
 x_t = reshape(zeros(nx,nt),nx,nt)
 x_an = reshape(zeros(nx),nx,1)  # nx 行 1 列行列へ変換
-x_an_lin = reshape(zeros(nx),nx,1)  # nx 行 1 列行列へ変換
 x_f = reshape(zeros(nx,nt),nx,nt)
 x_e = reshape(zeros(nx,nt),nx,nt)
-errors = reshape(zeros(nx,nt),nx,nt)
 Mop_linf = reshape(zeros(nx,nx),nx,nx)
-Mop_fulf = reshape(zeros(nx,1),nx,1)
-Mop_fult = reshape(zeros(nx,1),nx,1)
-Mop_fule = reshape(zeros(nx,1),nx,1)
 Pf = reshape(zeros(nx,nx),nx,nx)
 Pa = reshape(zeros(nx,nx),nx,nx)
 Ro = reshape(zeros(no,no),no,no)
@@ -133,21 +128,23 @@ lam_max = reshape(zeros(nt),nt)
 Egtime = reshape(zeros(nt,1),nt,1)
 L2Ntime = reshape(zeros(nt,1),nt,1)
 delta_x = reshape(zeros(nx,1),nx,1)
+I_mat = Matrix{Float64}(I,nx,nx)  # 単位行列の利用
 
 # Setting parameters
-xinit = [10.0, 20.0, 30.0]
 dt = 0.00001
 delx = 0.1  # small departure for the TL check
 k = 10.0
 r = 23.0
 b = 8.0/3.0
-I_mat = Matrix{Float64}(I,nx,nx)  # 単位行列の利用
 Pf = [20.0 20.0 20.0
       20.0 20.0 20.0
       20.0 20.0 20.0]
 Ro = [1.0 0.0 0.0
       0.0 1.0 0.0
       0.0 0.0 1.0]  # 行ベクトル [a b], 列ベクトル [a, b]
+
+xinit = [10.0, 20.0, 30.0]
+
 x_t[1:nx,1] = xinit[1:nx]
 x_f[1:nx,1] = x_t[1:nx,1] + 0.1 * xinit[1:nx]
 x_e[1:nx,1] = x_f[1:nx,1]
@@ -159,6 +156,7 @@ eps_inv = 1.0 / eps
 # TL check (If you need to check the Mop, please activate the next line.)
 # L63_TL_check(x_t[1:nx,1],delx.*fill(1.0,nx,1),dt,100,k,r,b)
 
+# Main assimilation-prediction cycle
 for i in 1:nt-1
     if mod(i-1,n_ascyc) == 0  # Entering the analysis processes
         println("Enter hear")
@@ -174,47 +172,39 @@ for i in 1:nt-1
         end
         d_innov = y_o[1:no,div(i-1,n_ascyc)+1] - x_f[1:no,i]        
         x_an = x_f[1:nx,i] + Kg * d_innov
-        x_an_lin = x_an
         t_o[div(i-1,n_ascyc)+1] = dt*(i-1)
     else
         Pa = Pf
         x_an = x_f[1:nx,i]
-        x_an_lin = x_an
     end
-
-    Mop_fult = L63_EU1(x_t[1:nx,i],dt,k,r,b)
-    Mop_fulf = L63_EU1(x_an,dt,k,r,b)
-    Mop_fule = L63_EU1(x_e[1:nx,i],dt,k,r,b)
-    Mop_linf = L63_tangent(x_an_lin,dt,k,r,b)
-    #for j in 1:nx
-    #    Mop_linf[1:nx,j] = eps_inv .* (L63_RK4(x_an_lin + eps .* I_mat[1:nx,j],dt,k,r,b) - L63_RK4(x_an_lin,dt,k,r,b))
-    #end
 
     #-- Forecast
     t[i] = dt*(i-1)
     
-    x_t[1:nx,i+1] = Mop_fult
-    x_e[1:nx,i+1] = Mop_fule
-    x_f[1:nx,i+1] = Mop_fulf
+    Mop_linf = L63_tangent(x_an,dt,k,r,b)
+    #for j in 1:nx
+    #    Mop_linf[1:nx,j] = eps_inv .* (L63_RK4(x_an_lin + eps .* I_mat[1:nx,j],dt,k,r,b) - L63_RK4(x_an_lin,dt,k,r,b))
+    #end
+
+    x_t[1:nx,i+1] = L63_EU1(x_t[1:nx,i],dt,k,r,b)
+    x_e[1:nx,i+1] = L63_EU1(x_e[1:nx,i],dt,k,r,b)
+    x_f[1:nx,i+1] = L63_EU1(x_an,dt,k,r,b)
     Pf = inf_fact * Mop_linf * Pa * Mop_linf'
-    #println(Pf[1,1], ",", Pf[2,2], ",", Pf[3,3])
     Pftime[1:nx,i+1] = diag(Pf)
     Egtime[i+1] = tr(Pf) / nx
     delta_x = x_f[1:nx,i+1] - x_t[1:nx,i+1]
-    L2Ntime[i+1] = sqrt(delta_x' * delta_x) / nx
-    lambda = eigen(Symmetric(Mop_linf' * Mop_linf),nx:nx)
-    lam_max[i+1] = lambda.values[1]  # 最大固有値
-    evec_max[1:nx,i+1] = lambda.vectors[1:nx,1]  # 最大固有値の固有ベクトル
+    L2Ntime[i+1] = sqrt(delta_x' * delta_x ./ nx)
     
     if mod(i-1,n_ascyc) == 0
-        println("Max Lam = ", i, ", ", lam_max[i+1])
-        println("Max Evec = ", evec_max[1:nx,i+1])
+        lambda = eigen(Symmetric(Mop_linf' * Mop_linf),nx:nx)
+        lam_max[i+1] = lambda.values[1]  # 最大固有値
+        evec_max[1:nx,i+1] = lambda.vectors[1:nx,1]  # 最大固有値の固有ベクトル
     end
 
 end
+
 t[nt] = t[nt-1] + dt
 
-errors = map(x->abs(x), x_f - x_t)
 
 #-- Drawing
 ##########
