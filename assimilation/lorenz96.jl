@@ -225,11 +225,7 @@ x_spin = reshape(zeros(nx,nspin),nx,nspin)
 x_an = reshape(zeros(nx),nx,1)  # nx 行 1 列行列へ変換
 x_f = reshape(zeros(nx,nt),nx,nt)
 x_e = reshape(zeros(nx,nt),nx,nt)
-errors = reshape(zeros(nx,nt),nx,nt)
 Mop_linf = reshape(zeros(nx,nx),nx,nx)
-Mop_fulf = reshape(zeros(nx,1),nx,1)
-Mop_fult = reshape(zeros(nx,1),nx,1)
-Mop_fule = reshape(zeros(nx,1),nx,1)
 Pf = reshape(zeros(nx,nx),nx,nx)
 Pa = reshape(zeros(nx,nx),nx,nx)
 Ro = reshape(zeros(no,no),no,no)
@@ -245,30 +241,25 @@ sigma_R = reshape(zeros(no,1),no,1)
 evec_max = reshape(zeros(nx,nto),nx,nto)
 lam_max = reshape(zeros(nto),nto)
 delta_x = reshape(zeros(nx,1),nx,1)
+I_mat = Matrix{Float64}(I,nx,nx)  # 単位行列の利用
 
 # Setting parameters
-xinit = fill(1.0,nx)
-xinit[1] = xinit[1] + 0.1
 dt = 0.01
 delx = 0.1  # small departure for the TL check
 F = 8.0  # default: 8
 sigma_const_R = 1.0
-
-I_mat = Matrix{Float64}(I,nx,nx)  # 単位行列の利用
 Pf = (1.0 .* I_mat) + fill(20.0,nx,nx)
 Ro = sigma_const_R * I_mat[1:no,1:no]
-
 #Hop = I_mat
-Hop = fill(0.0,no,nx)
 for i in 1:no
     Hop[i,i] = 1.0
 end
-lam_max[1] = 1.0
-evec_max = fill(0.0,nx,nto)
-eps_inv = 1.0 / eps
 
-# TL check (If you need to check the Mop, please activate the next line.)
-#L96_TL_check(x_t[1:nx,1],delx.*fill(1.0,nx,1),dt,1000,F,nx,"RK4")
+xinit = fill(1.0,nx)
+xinit[1] = xinit[1] + 0.1
+
+lam_max[1] = 1.0
+eps_inv = 1.0 / eps
 
 # spin-up simulation and making initial states
 x_spin[1:nx,1] = xinit
@@ -282,9 +273,13 @@ for i in 1:nx
 end
 x_e[1:nx,1] = x_f[1:nx,1]
 
+# TL check (If you need to check the Mop, please activate the next line.)
+#L96_TL_check(x_t[1:nx,1],delx.*fill(1.0,nx,1),dt,1000,F,nx,"RK4")
+
+
+# Main assimilation-prediction cycle
 
 Pftime[1:nx,1:nx,1] = Pf
-
 
 for i in 1:nt-1
     if mod(i-1,n_ascyc) == 0  # Entering the analysis processes
@@ -309,19 +304,17 @@ for i in 1:nt-1
         Pa = Pf
         x_an = x_f[1:nx,i]
     end
-    Mop_fult = L96_RK4(x_t[1:nx,i],dt,F,nx)
-    Mop_fulf = L96_RK4(x_an,dt,F,nx)
-    Mop_fule = L96_RK4(x_e[1:nx,i],dt,F,nx)
+    
+    #-- Forecast
     Mop_linf = L96_RK4_tangent(x_an,dt,F,nx)
     #for j in 1:nx
     #    Mop_linf[1:nx,j] = eps_inv .* (L96_RK4(x_an + eps .* I_mat[1:nx,j],dt,F,nx) - L96_RK4(x_an,dt,F,nx))
     #end
-    #-- Forecast
     t[i] = dt*(i-1)
     
-    x_t[1:nx,i+1] = Mop_fult
-    x_e[1:nx,i+1] = Mop_fule
-    x_f[1:nx,i+1] = Mop_fulf
+    x_t[1:nx,i+1] = L96_RK4(x_t[1:nx,i],dt,F,nx)
+    x_e[1:nx,i+1] = L96_RK4(x_e[1:nx,i],dt,F,nx)
+    x_f[1:nx,i+1] = L96_RK4(x_an,dt,F,nx)
     Pf = (Mop_linf * Pa) * Mop_linf'
 
     Egftime[i+1] = tr(Pf) / nx
@@ -338,8 +331,8 @@ for i in 1:nt-1
 end
 t[nt] = t[nt-1] + dt
 
-errors = map(x->abs(x), x_f - x_t)
 Pftime[1:nx,1:nx,2] = Pf
+
 
 #-- Drawing
 ##########
