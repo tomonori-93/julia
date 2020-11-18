@@ -1,225 +1,40 @@
-# Lorenz (1996) モデルで同化・解析処理を行うシミュレーション
+# Lorenz (1996) モデルで同化・解析処理を行うシミュレーション 2
+# 観測点を等間隔で間引いた実験が可能
 # Author: Satoki Tsujino (satoki_at_gfd-dennou.org)
-# Date: 2020/11/01
+# Date: 2020/11/14
+# Modification: 2020/11/18
 # License: LGPL2.1
-#############################
-# functions for calculation #
-#############################
-
-using LinearAlgebra
-
-function L96_tendency(x,F,N)  # calculation of tendency in Lorenz (1996)
-    # x: 状態変数
-    # F: 強制項の値 (スカラー)
-    # N: x の個数
-    m_res = fill(0.0,N)
-    
-    for i in 3:N-1
-        m_res[i] = - x[i] + (x[i+1] - x[i-2]) * x[i-1] + F
-    end
-    # i=1
-    m_res[1] = - x[1] + (x[2] - x[N-1]) * x[N] + F
-    # i=2
-    m_res[2] = - x[2] + (x[3] - x[N]) * x[1] + F
-    # i=N
-    m_res[N] = - x[N] + (x[1] - x[N-2]) * x[N-1] + F
-    
-    return m_res
-end
-
-function L96_EU1(x,dt,F,N)  # Lorenz (1996) with explicit Euler scheme
-    # x: 状態変数
-    # dt: 時間ステップ
-    # F: 強制項の値 (スカラー)
-    # N: x の個数
-    m_res = fill(0.0,N)
-    
-    m_res = x + dt * L96_tendency(x,F,N)
-    
-    return m_res
-end
-
-function L96_RK4(x,dt,F,N)  # Lorenz (1996) with the 4th-order Runge-Kutta scheme
-    # x: 状態変数
-    # dt: 時間ステップ
-    # F: 強制項の値 (スカラー)
-    # N: x の個数
-    m_res = fill(0.0,N)
-    
-    k1 = L96_tendency(x,F,N)
-    k2 = L96_tendency(x+0.5*dt*k1,F,N)
-    k3 = L96_tendency(x+0.5*dt*k2,F,N)
-    k4 = L96_tendency(x+dt*k3,F,N)
-    
-    m_res = x + dt * (k1 + 2.0 * k2 + 2.0 * k3 + k4) / 6.0
-    
-    return m_res
-end
-
-function L96_EU1_tangent(x,dt,N)  # The tangential operator for L96_EU1
-    # x: 状態変数
-    # dt: 時間ステップ
-    # N: x の個数
-    mt_res = fill(0.0,N,N)
-    
-    # 対角成分
-    for i in 1:N
-        mt_res[i,i] = (1.0 - dt)
-    end
-    # k-2
-    for i in 3:N
-        mt_res[i,i-2] = - dt * x[i-1]
-    end
-    # k-1
-    for i in 3:N-1
-        mt_res[i,i-1] = dt * (x[i+1] - x[i-2])
-    end
-    # k+1
-    for i in 2:N-1
-        mt_res[i,i+1] = dt * x[i-1]
-    end
-    # other terms
-    mt_res[1,2] = dt * x[N]
-    mt_res[N,1] = dt * x[N-1]
-    mt_res[1,N] = dt * (x[2] - x[N-1])
-    mt_res[2,1] = dt * (x[3] - x[N])
-    mt_res[N,N-1] = dt * (x[1] - x[N-2])
-    mt_res[1,N-1] = - dt * x[N]
-    mt_res[2,N] = - dt * x[1]
-    
-    return mt_res
-end
-
-function L96_RK4_Fdx(x,N)  # The gradient for the forcing term (i.e., dx/dt = F <- this) in L96_RK4
-    # x: 状態変数
-    # dt: 時間ステップ
-    # N: x の個数
-    mt_res = fill(0.0,N,N)
-    
-    # 対角成分
-    for i in 1:N
-        mt_res[i,i] = -1.0
-    end
-    # k-2
-    for i in 3:N
-        mt_res[i,i-2] = -x[i-1]
-    end
-    # k-1
-    for i in 3:N-1
-        mt_res[i,i-1] = x[i+1] - x[i-2]
-    end
-    # k+1
-    for i in 2:N-1
-        mt_res[i,i+1] = x[i-1]
-    end
-    # other terms
-    mt_res[1,2] = x[N]
-    mt_res[N,1] = x[N-1]
-    mt_res[1,N] = x[2] - x[N-1]
-    mt_res[2,1] = x[3] - x[N]
-    mt_res[N,N-1] = x[1] - x[N-2]
-    mt_res[1,N-1] = -x[N]
-    mt_res[2,N] = -x[1]
-    
-    return mt_res
-end
-
-function L96_RK4_tangent(x,dt,F,N)  # The tangential operator for L96_RK4
-    # x: 状態変数
-    # dt: 時間ステップ
-    # F: 強制項の値 (スカラー)
-    # N: x の個数
-    mt_res = fill(0.0,N,N)
-    dt6 = dt / 6.0
-    dt2 = 0.5 * dt
-    
-    I_mat = Matrix{Float64}(I,nx,nx)  # 単位行列の利用
-
-    k1 = L96_tendency(x,F,N)
-    x2 = x + dt2 .* k1
-    k2 = L96_tendency(x2,F,N)
-    x3 = x + dt2 .* k2
-    k3 = L96_tendency(x3,F,N)
-    x4 = x + dt .* k3
-    k4 = L96_tendency(x4,F,N)
-    
-    F1 = L96_RK4_Fdx(x,N)
-    F2 = L96_RK4_Fdx(x2,N)
-    F3 = L96_RK4_Fdx(x3,N)
-    F4 = L96_RK4_Fdx(x4,N)
-    
-    F12 = (I_mat + dt2 .* F1) * F2
-    F123 = (I_mat + dt2 .* F12) * F3
-    F1234 = (I_mat + dt .* F123) * F4
-    
-    mt_res = I_mat + dt6 .* (F1 + 2.0 .* F12 + 2.0 .* F123 + F1234)
-
-    return mt_res
-end
-
-function L96_TL_check(x,deltax,dt,nt,F,N,scheme)  # The TL check for L96_{EU1,RK4}_tangent
-    # x: 状態変数
-    # deltax: x に対する微小変数
-    # dt: 時間ステップ
-    # nt: 検証する時間ステップ数
-    # F: 強制項の値 (スカラー)
-    # N: x の個数
-    # scheme: 検証するスキームの種類, "EU1" or "RK4"
-    xt = x
-    delx = deltax
-    println("delx ",delx)
-    
-    if scheme == "EU1"
-        println("Start TL check for EU1")
-    elseif scheme == "RK4"
-        println("Start TL check for RK4")
-    end
-    
-    for i in 1:nt
-        if scheme == "EU1"
-            Lxt = L96_EU1(xt,dt,F,N)  # Time integration for x
-            Lxtd = L96_EU1(xt+delx,dt,F,N)  # Time integration for x + deltax
-            Mop = L96_EU1_tangent(xt,dt,N)  # TLM for x
-        elseif scheme == "RK4"
-            Lxt = L96_RK4(xt,dt,F,N)  # Time integration for x
-            Lxtd = L96_RK4(xt+delx,dt,F,N)  # Time integration for x + deltax
-            Mop = L96_RK4_tangent(xt,dt,F,N)  # TLM for x
-        end
-        Ldx = Lxtd - Lxt
-        Mdx = Mop * delx
-        println("TL check:i=",i,", (dL/dx)δx=",Ldx'*Ldx,", Mδx=",Mdx'*Mdx)
-        
-        # Updating x and deltax
-        xt = Lxt
-        delx = Mdx
-        println("dx check ",delx' * delx)
-    end
-    
-end
-
 ###########################
 # calculation (main) part #
 ###########################
+# 観測点を等間隔で間引く実験 (Miyoshi 2004 をほぼ再現可能, 48 h delta = 1.5 の結果を除く)
 
+include("./KF/lorenz96_module.jl")
+
+using .Lorenz96_functions
+using LinearAlgebra
 using Random
 using Statistics
 
 rng = MersenneTwister(1234)
 
-nt = 15000
+nt = 20000
 nx = 40
-no = 40
+no = 10
+noskip = 4  # nx/no
 n_ascyc = 5  # assimilation cycle interval for "t"
 rand_flag = true  # observation including random noise
 nto = div(nt,n_ascyc) + 1
-inf_fact = 1.05  # inflation factor
+inf_fact = 1.5  # inflation factor
 eps = 0.00001  # small value for tangential linear matrix of the model operator
-nspin = 3000
+nspin = 8000
 
 # Allocating
 t = zeros(nt)
 t_o = zeros(nto)
 y_o = reshape(zeros(no,nto),no,nto)
+x_inc = reshape(zeros(nx,nto),nx,nto)
+y_innov = reshape(zeros(no,nto),no,nto)
 x_t = reshape(zeros(nx,nt),nx,nt)
 x_spin = reshape(zeros(nx,nspin),nx,nspin)
 x_an = reshape(zeros(nx),nx,1)  # nx 行 1 列行列へ変換
@@ -248,11 +63,16 @@ dt = 0.01
 delx = 0.1  # small departure for the TL check
 F = 8.0  # default: 8
 sigma_const_R = 1.0
-Pf = (1.0 .* I_mat) + fill(20.0,nx,nx)
 Ro = sigma_const_R * I_mat[1:no,1:no]
 #Hop = I_mat
 for i in 1:no
-    Hop[i,i] = 1.0
+    Hop[(i-1)+1,(i-1)*noskip+1] = 1.0
+end
+for j in 1:nx
+    Pf[j,j] = 21.0
+    for i in 1:nx
+        Pf[i,j] = Pf[j,j] * exp(-100.0*(j-i)*(j-i))
+    end
 end
 
 xinit = fill(1.0,nx)
@@ -269,7 +89,7 @@ end
 
 x_t[1:nx,1] = x_spin[1:nx,nspin]
 for i in 1:nx
-    x_f[i,1] = mean(x_spin[i,1:nspin])
+    x_f[i,1] = mean(x_spin[i,nspin-7300:nspin])
 end
 x_e[1:nx,1] = x_f[1:nx,1]
 
@@ -291,12 +111,14 @@ for i in 1:nt-1
         Pa = inf_fact .* Pa  # covariance inflation
         if rand_flag == true
             sigma_R = randn(rng, Float64) * map( x->sqrt(x), diag(Ro) )  # Ro の対角成分を抽出し, 平方根をとる.
-            y_o[1:no,div(i-1,n_ascyc)+1] = x_t[1:no,i] + sigma_R[1:no,1]
+            y_o[1:no,div(i-1,n_ascyc)+1] = Hop * x_t[1:nx,i] + sigma_R[1:no,1]
         else
-            y_o[1:no,div(i-1,n_ascyc)+1] = x_t[1:no,i]
+            y_o[1:no,div(i-1,n_ascyc)+1] = Hop * x_t[1:nx,i]
         end
-        d_innov = y_o[1:no,div(i-1,n_ascyc)+1] - x_f[1:no,i]        
+        d_innov = y_o[1:no,div(i-1,n_ascyc)+1] - Hop * x_f[1:nx,i]        
         x_an = x_f[1:nx,i] + Kg * d_innov
+        x_inc[1:nx,div(i-1,n_ascyc)+1] = Kg * d_innov
+        y_innov[1:no,div(i-1,n_ascyc)+1] = d_innov
         t_o[div(i-1,n_ascyc)+1] = dt*(i-1)
         
         L2Natime[div(i-1,n_ascyc)+1,1] = sqrt((x_an - x_t[1:nx,i])' * (x_an - x_t[1:nx,i]) / nx)
@@ -323,11 +145,11 @@ for i in 1:nt-1
     L2Ntime[i+1] = sqrt((delta_x' * delta_x) / nx)
     
     if mod(i-1,n_ascyc) == 0  # Entering the analysis processes
-        lambda = eigen(Symmetric(Mop_linf' * Mop_linf),nx:nx)
-        lam_max[div(i-1,n_ascyc)+1] = lambda.values[1]  # 最大固有値
-        evec_max[1:nx,div(i-1,n_ascyc)+1] = lambda.vectors[1:nx,1]  # 最大固有値の固有ベクトル
+        #lambda = eigen(Symmetric(Mop_linf' * Mop_linf),nx:nx)
+        #lam_max[div(i-1,n_ascyc)+1] = lambda.values[1]  # 最大固有値
+        #evec_max[1:nx,div(i-1,n_ascyc)+1] = lambda.vectors[1:nx,1]  # 最大固有値の固有ベクトル
     end
-    
+        
 end
 t[nt] = t[nt-1] + dt
 
@@ -339,7 +161,6 @@ Pftime[1:nx,1:nx,2] = Pf
 #  Plot  #
 ##########
 using PyPlot
-
 fig = figure("pyplot_majorminor",figsize=(7,5))
 
 draw_num = 3
@@ -441,42 +262,51 @@ for i in 1:nto
     toax[1:nx,i] .= t_o[i] * 5.0
 end
 
-
-#-- Drawing partII
+#-- Drawing
 ##########
 #  Plot  #
 ##########
 rc("font", family="IPAPGothic")
 fig = figure("pyplot_majorminor",figsize=(7,5))
 
-draw_num2 = 3
+draw_num2 = 1
 if draw_num2 == 1
-    #cp = contourf(xax[1:nx,1:nx], xax'[1:nx,1:nx], Pftime[1:nx,1:nx,1], levels=[-15.0, -10.0, -5.0, 0.0, 5.0, 10.0, 15.0, 20.0], origin="image", cmap=ColorMap("viridis"), extend="both")
-    cp = contourf(xax[1:nx,1:nx], xax'[1:nx,1:nx], Pftime[1:nx,1:nx,2], origin="image", cmap=ColorMap("viridis"), extend="both")
+    cp = contourf(xax[1:nx,1:nx], xax'[1:nx,1:nx], Pftime[1:nx,1:nx,1], levels=[-15.0, -10.0, -5.0, 0.0, 5.0, 10.0, 15.0, 20.0], origin="image", cmap=ColorMap("viridis"), extend="both")
+    #cp = contourf(xax[1:nx,1:nx], xax'[1:nx,1:nx], Pftime[1:nx,1:nx,2], levels=[-2.0, -1.0, -0.5, -0.25, 0.25, 0.5, 1.0, 1.5, 2.0], origin="image", cmap=ColorMap("viridis"), extend="both")
+    #cp = contourf(xax[1:nx,1:no], xax'[1:nx,1:no], Pftime[1:nx,1:nx,2]*Hop'*inv(Hop*Pftime[1:nx,1:nx,2]*Hop'+Ro), origin="image", cmap=ColorMap("viridis"), extend="both")
 elseif draw_num2 == 2
-    cp = contourf(xax, tax, x_f, 10, levels=[-15.0, -10.0, -5.0, 0.0, 5.0, 10.0, 15.0], cmap=ColorMap("viridis"), extend="both")
+    cp = contourf(xax[1:nx,1:nt], tax[1:nx,1:nt], x_f[1:nx,1:nt], 10, levels=[-15.0, -10.0, -5.0, 0.0, 5.0, 10.0, 15.0], cmap=ColorMap("viridis"), extend="both")
 elseif draw_num2 == 3
-    println(evec_max[1:nx,nto-1])
     cp = contourf(xoax[1:nx,1:nto-1], toax[1:nx,1:nto-1], evec_max[1:nx,1:nto-1], 10, cmap=ColorMap("viridis"), extend="both")
+elseif draw_num2 == 4
+    cp = contourf(xoax[1:nx,1:40], toax[1:nx,1:40], x_inc[1:nx,1:40], levels=[-2.0, -1.0, -0.5, -0.25, 0.25, 0.5, 1.0, 1.5, 2.0], cmap=ColorMap("viridis"), extend="both")
+elseif draw_num2 == 5
+    cp = contourf(xoax[1:no,1:40], toax[1:no,1:40], y_innov[1:no,1:40], levels=[-2.0, -1.0, -0.5, -0.25, 0.25, 0.5, 1.0, 1.5, 2.0], cmap=ColorMap("viridis"), extend="both")
 end
 #ax.label(cp, inline=1, fontsize=10)
 #legend()
 ax = gca()
 
-if draw_num2 == 1 || draw_num2 == 2
+if draw_num2 == 1
     xlabel("変数 (X_k)")
     ylabel("変数 (X_k)")
-elseif draw_num2 == 3
+elseif draw_num2 == 5 || draw_num2 == 4 || draw_num2 == 3 || draw_num2 == 2
     xlabel("変数 (X_k)")
     ylabel("時間 (days)")
 end
 plt.colorbar(cp)
 grid("on")
 
-if draw_num2 == 1 || draw_num2 == 2
-    PyPlot.title("Lorenz96 (Pf)")
+if draw_num2 == 1
+    PyPlot.title("Lorenz96 (Kg)")
+elseif draw_num2 == 2
+    PyPlot.title("Lorenz96 (Xf)")
 elseif draw_num2 == 3
     PyPlot.title("Lorenz96 (Eigenvec_λmax)")
+elseif draw_num2 == 4
+    PyPlot.title("Lorenz96 (δx)")
+elseif draw_num2 == 5
+    PyPlot.title("Lorenz96 (D_innov)")
 end
 
 #########################
