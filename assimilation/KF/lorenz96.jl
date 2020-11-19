@@ -9,7 +9,7 @@
 ###########################
 # 観測点を等間隔で間引く実験 (Miyoshi 2004 をほぼ再現可能, 48 h delta = 1.5 の結果を除く)
 
-include("./KF/lorenz96_module.jl")
+include("./lorenz96_module.jl")
 
 using .Lorenz96_functions
 using LinearAlgebra
