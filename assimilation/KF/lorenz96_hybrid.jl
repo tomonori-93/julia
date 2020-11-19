@@ -1,4 +1,4 @@
-# Lorenz (1996) モデルで同化・解析処理を行うシミュレーション 1
+# Hybrid data assimilation simulation in Lorenz (1996) model.
 # Author: Satoki Tsujino (satoki_at_gfd-dennou.org)
 # Date: 2020/11/01
 # Modification: 2020/11/18, 2020/11/19
@@ -19,7 +19,7 @@ rng = MersenneTwister(1234)
 
 nt = 20000
 nx = 40
-no = 32
+no = 40
 n_ascyc = 5  # assimilation cycle interval for "t"
 fact_1day = 0.2  # Time for 1 day
 rand_flag = true  # observation including random noise
