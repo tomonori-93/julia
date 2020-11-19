@@ -9,8 +9,9 @@
 module Lorenz96_functions
 
 using LinearAlgebra
+using Statistics
 
-export L96_EU1, L96_RK4, L96_EU1_tangent, L96_RK4_tangent, L96_TL_check
+export L96_EU1, L96_RK4, L96_EU1_tangent, L96_RK4_tangent, L96_TL_check, L96_get_background_stat
 
 function L96_tendency(x,F,N)  # calculation of tendency in Lorenz (1996)
     # x: 状態変数
@@ -199,6 +200,47 @@ function L96_TL_check(x,deltax,dt,nt,F,N,scheme)  # The TL check for L96_{EU1,RK
         println("dx check ",delx' * delx)
     end
     
+end
+
+function L96_get_background_stat(x,dt,del_x,F,N,Nsamp,Ninteg)
+    # x(N,Nsamp): 状態変数
+    # dt: 時間ステップ
+    # del_x: 誤差の振幅
+    # F: 強制項の値 (スカラー)
+    # N: x の個数
+    # Nsamp: 共分散計算のサンプル数
+    # Nnteg: 誤差の時間発展積分ステップ数
+    Mop_linear = reshape(zeros(N,N),N,N)
+    gb_res = reshape(zeros(N,N),N,N)
+    lambda_max = fill(0.0,Nsamp)
+    eigvec_max = reshape(zeros(N,Nsamp),N,Nsamp)
+    xt = reshape(zeros(N,1),N,1)
+    xe = reshape(zeros(N,1),N,1)
+    gb = reshape(zeros(N,N,Nsamp),N,N,Nsamp)
+    
+    for i in 1:Nsamp
+        Mop_linear = L96_RK4_tangent(x[1:N,i],dt,F,N)
+        lambda = eigen(Symmetric(Mop_linear' * Mop_linear),N:N)
+        lambda_max = lambda.values[1]  # 最大固有値
+        eigvec_max[1:N,i] = lambda.vectors[1:N,1]  # 最大固有値の固有ベクトル
+        xt = x[1:N,i]
+        xe = xt + del_x .* eigvec_max[1:N,i]
+        
+        for j in 1:Ninteg
+            xt = L96_RK4(xt,dt,F,N)
+            xe = L96_RK4(xe,dt,F,N)
+        end
+        
+        gb[1:N,1:N,i] = (xe - xt) * (xe - xt)'
+    end
+
+    for i in 1:N
+        for j in 1:N
+            gb_res[i,j] = mean(gb[i,j,1:Nsamp])
+        end
+    end
+
+    return gb_res
 end
 
 end

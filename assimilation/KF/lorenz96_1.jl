@@ -1,7 +1,7 @@
 # Lorenz (1996) モデルで同化・解析処理を行うシミュレーション 1
 # Author: Satoki Tsujino (satoki_at_gfd-dennou.org)
 # Date: 2020/11/01
-# Modification: 2020/11/18
+# Modification: 2020/11/18, 2020/11/19
 # License: LGPL2.1
 ###########################
 # calculation (main) part #
@@ -13,18 +13,22 @@ using .Lorenz96_functions
 using LinearAlgebra
 using Random
 using Statistics
+import Mmap
 
 rng = MersenneTwister(1234)
 
-nt = 15000
+nt = 20000
 nx = 40
-no = 40
+no = 32
 n_ascyc = 5  # assimilation cycle interval for "t"
+fact_1day = 0.2  # Time for 1 day
 rand_flag = true  # observation including random noise
 nto = div(nt,n_ascyc) + 1
-inf_fact = 1.05  # inflation factor
+inf_fact = 1.1  # inflation factor
 eps = 0.00001  # small value for tangential linear matrix of the model operator
-nspin = 3000
+nspin = 10000  # spin-up steps
+nstat = 366  # period for getting static background covariance error [days]
+beta = 0.2  # weighting ratio for static background covariance error in Hybrid EKF
 
 # Allocating
 t = zeros(nt)
@@ -32,11 +36,15 @@ t_o = zeros(nto)
 y_o = reshape(zeros(no,nto),no,nto)
 x_t = reshape(zeros(nx,nt),nx,nt)
 x_spin = reshape(zeros(nx,nspin),nx,nspin)
+x_back = reshape(zeros(nx,nstat),nx,nstat)
 x_an = reshape(zeros(nx),nx,1)  # nx 行 1 列行列へ変換
 x_f = reshape(zeros(nx,nt),nx,nt)
 x_e = reshape(zeros(nx,nt),nx,nt)
+x_inc = reshape(zeros(nx,nto),nx,nto)
 Mop_linf = reshape(zeros(nx,nx),nx,nx)
 Pf = reshape(zeros(nx,nx),nx,nx)
+Pflow = reshape(zeros(nx,nx),nx,nx)
+Pstat = reshape(zeros(nx,nx),nx,nx)
 Pa = reshape(zeros(nx,nx),nx,nx)
 Ro = reshape(zeros(no,no),no,no)
 Hop = reshape(zeros(no,nx),no,nx)
@@ -54,11 +62,12 @@ delta_x = reshape(zeros(nx,1),nx,1)
 I_mat = Matrix{Float64}(I,nx,nx)  # 単位行列の利用
 
 # Setting parameters
-dt = 0.01
+dt = 0.01  # Time step for integration
+n_1day = Int(fact_1day / dt)
 delx = 0.1  # small departure for the TL check
 F = 8.0  # default: 8
 sigma_const_R = 1.0
-Pf = (1.0 .* I_mat) + fill(20.0,nx,nx)
+Pflow = (1.0 .* I_mat) + fill(20.0,nx,nx)
 Ro = sigma_const_R * I_mat[1:no,1:no]
 #Hop = I_mat
 for i in 1:no
@@ -86,14 +95,33 @@ x_e[1:nx,1] = x_f[1:nx,1]
 # TL check (If you need to check the Mop, please activate the next line.)
 #L96_TL_check(x_t[1:nx,1],delx.*fill(1.0,nx,1),dt,1000,F,nx,"RK4")
 
+# Get static background covariance error (This procedure is replaced with an NMC method.)
+# In advance, you need to run the script "lorenz96_NMC.jl", and make a binary file of "Pstat.bin"
+#icounter = 1
+#for i in nspin - nstat * n_1day:nspin - 1
+#    if i % n_1day == 0
+#        x_back[1:nx,icounter] = x_spin[1:nx,i]
+#        icounter = icounter + 1
+#    end
+#end
+#icounter = icounter - 1
+#Pstat = L96_get_background_stat(x_back[1:nx,1:icounter],dt,5.0,F,nx,icounter,n_1day)
+oi = open("Pstat.bin","r")
+Pstat = Mmap.mmap(oi, Array{Float64, 2}, (nx, nx))
+close(oi)
 
 # Main assimilation-prediction cycle
 
+Pf = beta .* Pstat + (1.0 - beta) .* Pflow
 Pftime[1:nx,1:nx,1] = Pf
 
 for i in 1:nt-1
     if mod(i-1,n_ascyc) == 0  # Entering the analysis processes
         #println("Enter hear")
+        #-- Hybrid covariance
+        Pflow = Pf
+        Pf = beta .* Pstat + (1.0 - beta) .* Pflow
+        
         #-- Analysis
         L_inv = inv(Hop * Pf * Hop' + Ro)
         Kg = (Pf * Hop') * L_inv
@@ -105,8 +133,9 @@ for i in 1:nt-1
         else
             y_o[1:no,div(i-1,n_ascyc)+1] = x_t[1:no,i]
         end
-        d_innov = y_o[1:no,div(i-1,n_ascyc)+1] - x_f[1:no,i]        
+        d_innov = y_o[1:no,div(i-1,n_ascyc)+1] - x_f[1:no,i]
         x_an = x_f[1:nx,i] + Kg * d_innov
+        x_inc[1:nx,div(i-1,n_ascyc)+1] = x_an - x_f[1:nx,i]
         t_o[div(i-1,n_ascyc)+1] = dt*(i-1)
         
         L2Natime[div(i-1,n_ascyc)+1,1] = sqrt((x_an - x_t[1:nx,i])' * (x_an - x_t[1:nx,i]) / nx)
@@ -142,7 +171,6 @@ end
 t[nt] = t[nt-1] + dt
 
 Pftime[1:nx,1:nx,2] = Pf
-
 
 #-- Drawing
 ##########
