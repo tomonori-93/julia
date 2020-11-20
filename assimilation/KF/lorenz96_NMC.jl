@@ -15,18 +15,24 @@ using Statistics
 
 rng = MersenneTwister(1234)
 
-nt = 15000
-nx = 40
-no = 40
-n_ascyc = 5  # assimilation cycle interval for "t"
-n_nmcyc = 20  # NMC cycle for "t"
-rand_flag = true  # observation including random noise
-nto = div(nt,n_ascyc) + 1
+####### setting parameters by user #######
+nt = 15000  # Integration time step
+nx = 40  # Grid number in the model
+no = 40  # Observation number
+n_ascyc = 5  # assimilation cycle interval for time
+n_nmcyc = 20  # NMC cycle for time
+rand_flag = true  # observation flag including random noise
 inf_fact = 1.05  # inflation factor
 nspin = 10000  # spin-up steps
 n_nmc = 365  # sample number for getting static background covariance error
+dt = 0.01  # Time step for integration
+F = 8.0  # Forcing value in Lorenz96 model (default: 8)
+sigma_const_R = 1.0  # Standard deviation for observation
+####### setting parameters by user #######
 
-# Allocating
+nto = div(nt,n_ascyc) + 1
+
+# Allocate ane initialize
 y_o = reshape(zeros(no),no)
 x_t = reshape(zeros(nx),nx)
 x_spin = reshape(zeros(nx,nspin),nx,nspin)
@@ -44,16 +50,12 @@ Kg = reshape(zeros(nx,no),nx,no)
 sigma_R = reshape(zeros(no,1),no,1)
 I_mat = Matrix{Float64}(I,nx,nx)  # 単位行列の利用
 
-# Setting parameters
-dt = 0.01  # Time step for integration
-F = 8.0  # default: 8
-sigma_const_R = 1.0
+# setting values for initial states of X (for spin-up simulation) and Pf
 Pf = (1.0 .* I_mat) + fill(20.0,nx,nx)
 Ro = sigma_const_R * I_mat[1:no,1:no]
 for i in 1:no
     Hop[i,i] = 1.0
 end
-
 xinit = fill(1.0,nx)
 xinit[1] = xinit[1] + 0.1
 
