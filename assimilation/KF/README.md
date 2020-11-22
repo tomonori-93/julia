@@ -2,11 +2,7 @@
 EKF data assimilation system for the nonlinear model in Lorenz (1996)
 
 ## Basic equations of the Lorenz96 model
-$$
-\begin{eqnarray}
-\frac{dX_k}{dt} = f
-\end{eqnarray}
-$$
+\\(a + b\\)
 
 # lorenz96_hybrid.jl
 Hybrid EKF data assimilation system for the nonlinear model in Lorenz (1996)
