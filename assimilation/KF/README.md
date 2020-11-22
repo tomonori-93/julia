@@ -2,7 +2,7 @@
 EKF data assimilation system for the nonlinear model in Lorenz (1996)
 
 ## Basic equations of the Lorenz96 model
-$$a+b=c$$
+\\[a+b=C\\]
 
 # lorenz96_hybrid.jl
 Hybrid EKF data assimilation system for the nonlinear model in Lorenz (1996)
