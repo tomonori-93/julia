@@ -1,6 +1,4 @@
-<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS_CHTML"></script>
-
-[Documentation](https://tomonori-93.github.io/julia/assimilation/KF/)
+[**Formulation**](https://tomonori-93.github.io/julia/assimilation/KF/formulation.md)
 
 # EnKF_module.jl
 Module script: Basic functions for EnKF (Ensemble Kalman Filter)
