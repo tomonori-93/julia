@@ -7,8 +7,8 @@
 # calculation (main) part #
 ###########################
 
-include("./KF/EnKF_module.jl")
-include("./KF/lorenz96_module.jl")
+include("./EnKF_module.jl")
+include("./lorenz96_module.jl")
 
 using .EnKF_functions
 using .Lorenz96_functions
