@@ -1,4 +1,4 @@
-[**Formulation**](https://tomonori-93.github.io/julia/assimilation/KF/formulation.md)
+[**Formulation**](https://tomonori-93.github.io/julia/assimilation/KF/formulation.html)
 
 # Modules
 ## EnKF_module.jl
@@ -17,15 +17,15 @@ Script to create a binary file of Pstat.bin (provides a static background covari
 ## lorenz96_hybrid.jl
 Hybrid EKF data assimilation system for the nonlinear model in Lorenz (1996)
 
-### Required modules
-lorenz96_module.jl
-
-### Required files
-You need to run lorenz96_NMC.jl to create a static background covariance error matrix file (Pstat.bin). 
+- **Required modules**: [lorenz96_module.jl](lorenz96_module.jl)
+- **Required files**: You need to run [lorenz96_NMC.jl](lorenz96_NMC.jl) to create a static background covariance error matrix file (Pstat.bin). 
 
 ## lorenz96_SEEK.jl
 SEEK Filter data assimilation system for the nonlinear model in Lorenz (1996)
 
+- **Required modules**: [lorenz96_module.jl](lorenz96_module.jl)
+
 ## lorenz96_LETKF.jl
 LETKF data assimilation system for the nonlinear model in Lorenz (1996)
 
+- **Required modules**: [lorenz96_module.jl](lorenz96_module.jl), [EnKF_module.jl](EnKF_module.jl)
