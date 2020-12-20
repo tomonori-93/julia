@@ -7,7 +7,7 @@
 # calculation (main) part #
 ###########################
 
-include("./KF/lorenz96_module.jl")
+include("./lorenz96_module.jl")
 
 using .Lorenz96_functions
 using LinearAlgebra
