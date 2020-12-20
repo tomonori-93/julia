@@ -4,3 +4,5 @@
 \begin{equation}
 a+b=C
 \end{equation}
+
+\[a+b=C\] $$a+b+C$$
