@@ -7,12 +7,12 @@
 # calculation (main) part #
 ###########################
 
-#include("./KF/lorenz96_module.jl")
+include("./KF/lorenz96_module.jl")
 
-#using .Lorenz96_functions
-#using LinearAlgebra
-#using Random
-#using Statistics
+using .Lorenz96_functions
+using LinearAlgebra
+using Random
+using Statistics
 
 rng = MersenneTwister(1234)
 
