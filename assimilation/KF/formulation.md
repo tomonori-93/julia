@@ -28,7 +28,7 @@ X_{k-N}=X_k=X_{k+N}. \tag{L.2} \label{eq:exam-3-2-3-2}
 
 - Kalman filter equation: 
 \begin{equation}
-\textbf{x}^{\mathrm{a}} _i=\textbf{x}^{\mathrm{f}} _i+\textbf{K} _i \left[\textbf{y}^{\mathrm{o}} _i -H_i(\textbf{x}^{\mathrm{f}} _i) \right] =\textbf{x}^{\mathrm{f}} _i+\textbf{K} _i \textbf{d} _i, \tag{3.2.3} \label{eq:3-2-3}
+\textbf{x}^{\mathrm{a}} _i=\textbf{x}^{\mathrm{f}} _i+\textbf{K} _i \left[\textbf{y}^{\mathrm{o}} _i -H_i(\textbf{x}^{\mathrm{f}} _i) \right] , \tag{3.2.3} \label{eq:3-2-3}
 \end{equation}
 
 
