@@ -16,11 +16,17 @@ X_{k-N}=X_k=X_{k+N}. \label{eq:exam-3-2-3-2}
 # The data assimilation-prediction cycle in the Kalman Filter
 - Prediction equations:
 \begin{equation}
-\textbf{\textit{x}}^{\mathrm{f}} _{i+1}=M(\textbf{\textit{x}}^{\mathrm{a}} _i), \tag{3.2.1} \label{eq:3-2-1}
+\textbf{x}^{\mathrm{f}} _{i+1}=M(\textbf{x}^{\mathrm{a}} _i), \tag{3.2.1} \label{eq:3-2-1}
 \end{equation}
 
-where \\(\textbf{\textit{x}}^{\mathrm{f}}\\) and \\(\textbf{\textit{x}}^{\mathrm{a}}\\) are forecast (i.e., first guess) and analysis variables, respectively.
+where \\(\textbf{x}^{\mathrm{f}}\\) and \\(\textbf{x}^{\mathrm{a}}\\) are forecast (i.e., first guess) and analysis variables, respectively.
 
 - Kalman gain equation
+
+- Kalman filter equation: 
+\begin{equation}
+\textbf{x}^{\mathrm{a}} _i=\textbf{x}^{\mathrm{f}} _i+\textbf{K} _i \left[\textbf{y}^{\mathrm{o}} _i -H_i(\textbf{x}^{\mathrm{f}} _i) \right] =\textbf{x}^{\mathrm{f}} _i+\textbf{K} _i \textbf{d} _i, \tag{3.2.3} \label{eq:3-2-3}
+\end{equation}
+
 
 - Analysis equation
