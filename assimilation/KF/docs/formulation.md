@@ -42,7 +42,7 @@ X_{k-N}=X_k=X_{k+N}. \tag{L.2} \label{eq:exam-3-2-3-2}
   - \\(\textbf{P} ^{\mathrm{f}} \\): Background covariance matrix (\\(N\times N\\)), 
   - \\(\textbf{P} ^{\mathrm{a}} \\): Analysis covariance matrix (\\(N\times N\\)), 
   - \\(M\\): Model operator for time integration (linear or non-linear), 
-  - \\(\textbf{M} \equiv \partial M/\partial \textbf{x} \\): Tangent linear operator corresponding to the Model operator, 
+  - \\(\textbf{M} \equiv \partial M/\partial \textbf{x} \\): Tangent linear operator corresponding to the Model operator (\\(N\times N\\)), 
   - \\(H\\): Observation operator (linear or non-linear), 
-  - \\(\textbf{H} \equiv \partial H/\partial \textbf{x} \\): Tangent linear operator corresponding to the Observation operator, 
+  - \\(\textbf{H} \equiv \partial H/\partial \textbf{x} \\): Tangent linear operator corresponding to the Observation operator (\\(p\times N\\)), 
 
