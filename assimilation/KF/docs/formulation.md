@@ -16,28 +16,35 @@ X_{k-N}=X_k=X_{k+N}. \tag{L.2} \label{eq:exam-3-2-3-2}
 # The data assimilation-prediction cycle in the Kalman Filter
 - Prediction equations:
 \begin{equation}
-\textbf{x}^{\mathrm{f}} _{i+1}=M(\textbf{x}^{\mathrm{a}} _i), \tag{KF.1} \label{eq:3-2-1}
+\textbf{x}^{\mathrm{f}} _{i+1}=M(\textbf{x}^{\mathrm{a}} _i), \tag{KF.1} \label{eq:KF-1}
 \end{equation}
 \begin{equation}
-\textbf{P} ^{\mathrm{f}} _{i+1}\approx \textbf{M} \textbf{P} ^{\mathrm{a}} _i \textbf{M} ^T. \tag{KF.2} \label{eq:3-2-12}
+\textbf{P} ^{\mathrm{f}} _{i+1}\approx \textbf{M} \textbf{P} ^{\mathrm{a}} _i \textbf{M} ^T. \tag{KF.2} \label{eq:KF-2}
 \end{equation}
-
-  - \\(\textbf{x}^{\mathrm{f}}\\): Forecast (i.e., first guess) variables (\\(N\\)-dimension vector), 
-  - \\(\textbf{x}^{\mathrm{a}}\\): Analysis variables (\\(N\\)-dimension vector), 
-  - \\(\textbf{P} ^{\mathrm{f}} \\): Background covariance matrix (\\(N\times N\\)), 
-  - \\(\textbf{P} ^{\mathrm{a}} \\): Analysis covariance matrix (\\(N\times N\\)), 
-  - \\(M\\): Model operator (linear or non-linear), 
-  - \\(\textbf{M} \\): Tangent linear operator corresponding to the Model operator, 
 
 - Kalman gain (\\(\textbf{K} _i\\)) equation:
 \begin{equation}
-\textbf{K} _i=\textbf{P} ^{\mathrm{f}} _i \textbf{H} ^T_i\left(\textbf{H} _i \textbf{P} ^{\mathrm{f}} _i \textbf{H} ^T_i+\textbf{R} _i \right) ^{-1}. \tag{KF.3} \label{eq:3-2-9}
+\textbf{K} _i=\textbf{P} ^{\mathrm{f}} _i \textbf{H} ^T_i\left(\textbf{H} _i \textbf{P} ^{\mathrm{f}} _i \textbf{H} ^T_i+\textbf{R} _i \right) ^{-1}. \tag{KF.3} \label{eq:KF-3}
 \end{equation}
 
 - Kalman filter equation: 
 \begin{equation}
-\textbf{x}^{\mathrm{a}} _i=\textbf{x}^{\mathrm{f}} _i+\textbf{K} _i \left[\textbf{y}^{\mathrm{o}} _i -H_i(\textbf{x}^{\mathrm{f}} _i) \right] , \tag{3.2.3} \label{eq:3-2-3}
+\textbf{x}^{\mathrm{a}} _i=\textbf{x}^{\mathrm{f}} _i+\textbf{K} _i \left[\textbf{y}^{\mathrm{o}} _i -H_i(\textbf{x}^{\mathrm{f}} _i) \right] . \tag{KF.4} \label{eq:KF-4}
 \end{equation}
 
-
 - Analysis equation
+\begin{equation}
+\textbf{P} ^{\mathrm{a}} _i=\left(\textbf{I} -\textbf{K} _i\textbf{H} _i \right) \textbf{P} ^{\mathrm{f}} _i. \tag{KF.5} \label{eq:KF-5}
+\end{equation}
+
+- Symbols
+  - \\(\textbf{x}^{\mathrm{f}}\\): Forecast (i.e., first guess) variables (\\(N\\)-dimension vector), 
+  - \\(\textbf{x}^{\mathrm{a}}\\): Analysis variables (\\(N\\)-dimension vector), 
+  - \\(\textbf{y}^{\mathrm{o}}\\): Observation variables (\\(p\\)-dimension vector), 
+  - \\(\textbf{P} ^{\mathrm{f}} \\): Background covariance matrix (\\(N\times N\\)), 
+  - \\(\textbf{P} ^{\mathrm{a}} \\): Analysis covariance matrix (\\(N\times N\\)), 
+  - \\(M\\): Model operator for time integration (linear or non-linear), 
+  - \\(\textbf{M} \equiv \left. \partial M/\partial \textbf{x} \right|_{\textbf{x} =\textbf{x}^{\mathrm{f}}} \\): Tangent linear operator corresponding to the Model operator, 
+  - \\(H\\): Observation operator (linear or non-linear), 
+  - \\(\textbf{H} \equiv \left. \partial H/\partial \textbf{x} \right|_{\textbf{x} =\textbf{x}^{\mathrm{f}}} \\): Tangent linear operator corresponding to the Observation operator, 
+
