@@ -1,4 +1,4 @@
-[**Formulation**](https://tomonori-93.github.io/julia/assimilation/KF/formulation.html)
+[**Formulation**](https://tomonori-93.github.io/julia/assimilation/KF/docs/formulation.html)
 
 # Modules
 ## EnKF_module.jl
