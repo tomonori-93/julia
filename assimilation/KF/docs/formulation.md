@@ -18,8 +18,14 @@ X_{k-N}=X_k=X_{k+N}. \tag{L.2} \label{eq:exam-3-2-3-2}
 \begin{equation}
 \textbf{x}^{\mathrm{f}} _{i+1}=M(\textbf{x}^{\mathrm{a}} _i), \tag{KF.1} \label{eq:3-2-1}
 \end{equation}
+\begin{equation}
+\textbf{P} ^{\mathrm{f}} _{i+1}\approx \textbf{M} \textbf{P} ^{\mathrm{a}} _i \textbf{M} ^T.} \tag{KF.2} \label{eq:3-2-12}
+\end{equation}
 
-  where \\(\textbf{x}^{\mathrm{f}}\\) and \\(\textbf{x}^{\mathrm{a}}\\) are forecast (i.e., first guess) and analysis variables, respectively.
+  - \\(\textbf{x}^{\mathrm{f}}\\): Forecast (i.e., first guess) variables (\\(N\\)-dimension vector), 
+  - \\(\textbf{x}^{\mathrm{a}}\\): Analysis variables (\\(N\\)-dimension vector), 
+  - \\(\textbf{P} ^{\mathrm{f}} \\): Background covariance matrix (\\(N\times N\\)), 
+  - \\(\textbf{P} ^{\mathrm{a}} \\): Analysis covariance matrix (\\(N\times N\\)), 
 
 - Kalman gain (\\(\textbf{K} _i\\)) equation:
 \begin{equation}
