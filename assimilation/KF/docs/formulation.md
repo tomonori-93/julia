@@ -16,16 +16,16 @@ X_{k-N}=X_k=X_{k+N}. \tag{L.2} \label{eq:exam-3-2-3-2}
 # Time integration for the forecast
 The Lorenz96 equation (\ref{eq:exam-3-2-3-1}): 
 \begin{equation}
-\dfrac{d\textbf{\textit{x}}}{dt} =f(t,\textbf{\textit{x}}),\quad \textbf{\textit{x}} \equiv (X_1,\cdots ,X_k,\cdots ,X_N)^T \tag{F.1} \label{eq:app-1-1}
+\dfrac{d\textbf{x}}{dt} =f(t,\textbf{x}),\quad \textbf{x} \equiv (X_1,\cdots ,X_k,\cdots ,X_N)^T \tag{F.1} \label{eq:app-1-1}
 \end{equation}
 is integrated by the standard 4th-order Runge-Kutta scheme: 
 \begin{equation}
 \begin{split}
-&\textbf{\textit{x}} _{i+1} =\textbf{\textit{x}} _i+\dfrac{\Delta t}{6} \left(\textbf{\textit{k}} _1+2\textbf{\textit{k}} _2+2\textbf{\textit{k}} _3+\textbf{\textit{k}} _4 \right) =M(\textbf{\textit{x}} _i) ,\\
-&\textbf{\textit{k}} _1\equiv f(t_i,\textbf{\textit{x}} _i) , \\
-&\textbf{\textit{k}} _2\equiv f(t_i+\Delta t/2,\textbf{\textit{x}} _i+(\Delta t/2)\textbf{\textit{k}} _1) =f(t^{(2)}_i,\textbf{\textit{x}} ^{(2)}_i) , \\
-&\textbf{\textit{k}} _3\equiv f(t_i+\Delta t/2,\textbf{\textit{x}} _i+(\Delta t/2)\textbf{\textit{k}} _2) =f(t^{(3)}_i,\textbf{\textit{x}} ^{(3)}_i) , \\
-&\textbf{\textit{k}} _4\equiv f(t_i+\Delta t,\textbf{\textit{x}} _i+\Delta t\textbf{\textit{k}} _3) =f(t^{(4)}_i,\textbf{\textit{x}} ^{(4)}_i) .
+&\textbf{x} _{i+1} =\textbf{x} _i+\dfrac{\Delta t}{6} \left(\textbf{k} _1+2\textbf{k} _2+2\textbf{k} _3+\textbf{k} _4 \right) =M(\textbf{x} _i) ,\\
+&\textbf{k} _1\equiv f(t_i,\textbf{x} _i) , \\
+&\textbf{k} _2\equiv f(t_i+\Delta t/2,\textbf{x} _i+(\Delta t/2)\textbf{k} _1) =f(t^{(2)}_i,\textbf{x} ^{(2)}_i) , \\
+&\textbf{k} _3\equiv f(t_i+\Delta t/2,\textbf{x} _i+(\Delta t/2)\textbf{k} _2) =f(t^{(3)}_i,\textbf{x} ^{(3)}_i) , \\
+&\textbf{k} _4\equiv f(t_i+\Delta t,\textbf{x} _i+\Delta t\textbf{k} _3) =f(t^{(4)}_i,\textbf{x} ^{(4)}_i) .
 \end{split}
 \tag{F.2} \label{eq:app-1-2}
 \end{equation}
