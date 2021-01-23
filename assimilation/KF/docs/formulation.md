@@ -77,7 +77,7 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 
 
 # The data assimilation-forecast cycle in the Singular Evolutive Extended Kalman Filter (SEEK Filter)
-- Forecast equations:
+- Forecast equations (Under construction):
   \begin{equation}
   \textbf{x}^{\mathrm{f}} \_{i+1}=M(\textbf{x}^{\mathrm{a}} \_i), \tag{SEEKF.1} \label{eq:SEEKF-1}
   \end{equation}
