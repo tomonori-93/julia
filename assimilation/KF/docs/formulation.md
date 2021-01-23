@@ -20,19 +20,19 @@ The Lorenz96 equation (\ref{eq:exam-3-2-3-1}):
 \end{equation}
 is integrated by the standard 4th-order Runge-Kutta scheme: 
 \begin{equation*}
-&\textbf{x} _{i+1} =\textbf{x} _i+\dfrac{\Delta t}{6} \left(\textbf{k} _1+2\textbf{k} _2+2\textbf{k} _3+\textbf{k} _4 \right) =M(\textbf{x} _i) ,\\
+\textbf{x} _{i+1} =\textbf{x} _i+\dfrac{\Delta t}{6} \left(\textbf{k} _1+2\textbf{k} _2+2\textbf{k} _3+\textbf{k} _4 \right) =M(\textbf{x} _i) ,\\
 \end{equation*}
 \begin{equation*}
-&\textbf{k} _1\equiv f(t_i,\textbf{x} _i) ,
+\textbf{k} _1\equiv f(t_i,\textbf{x} _i) ,
 \end{equation*}
 \begin{equation*}
-&\textbf{k} _2\equiv f(t_i+\Delta t/2,\textbf{x} _i+(\Delta t/2)\textbf{k} _1) =f(t^{(2)}_i,\textbf{x} ^{(2)}_i) ,
+\textbf{k} _2\equiv f(t_i+\Delta t/2,\textbf{x} _i+(\Delta t/2)\textbf{k} _1) =f(t^{(2)}_i,\textbf{x} ^{(2)}_i) ,
 \end{equation*}
 \begin{equation*}
-&\textbf{k} _3\equiv f(t_i+\Delta t/2,\textbf{x} _i+(\Delta t/2)\textbf{k} _2) =f(t^{(3)}_i,\textbf{x} ^{(3)}_i) ,
+\textbf{k} _3\equiv f(t_i+\Delta t/2,\textbf{x} _i+(\Delta t/2)\textbf{k} _2) =f(t^{(3)}_i,\textbf{x} ^{(3)}_i) ,
 \end{equation*}
 \begin{equation*}
-&\textbf{k} _4\equiv f(t_i+\Delta t,\textbf{x} _i+\Delta t\textbf{k} _3) =f(t^{(4)}_i,\textbf{x} ^{(4)}_i) .
+\textbf{k} _4\equiv f(t_i+\Delta t,\textbf{x} _i+\Delta t\textbf{k} _3) =f(t^{(4)}_i,\textbf{x} ^{(4)}_i) .
 \end{equation*}
 
 
@@ -114,11 +114,12 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 # The data assimilation-forecast cycle in the Local Ensemble Transform Kalman Filter (LETKF)
 - Forecast equations (for each ensemble member, m):
 \begin{equation}
-\textbf{X}^{\mathrm{f}} _{i+1}=M(\textbf{X}^{\mathrm{a}(m)} _i), \tag{LETKF.1} \label{eq:LETKF-1}
+\textbf{X}^{\mathrm{f}} _{i+1}=M(\textbf{X}^{\mathrm{a}} _i), \tag{LETKF.1} \label{eq:LETKF-1}
 \end{equation}
 \begin{equation}
 \textbf{X}\equiv \left[\textbf{x}^{(1)}|\cdots |\textbf{x}^{(m)} \right] =\overline{\textbf{X}} +\delta \textbf{X} , \tag{LETKF.2} \label{eq:LETKF-2}
 \end{equation}
+where \\(\overline{(\; )}\\) means ensemble mean. 
 
 - Analysis equations: 
 \begin{equation}
