@@ -78,12 +78,11 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 
 # The data assimilation-forecast cycle in the Singular Evolutive Extended Kalman Filter (SEEK Filter)
 - Forecast equations:
-
   \begin{equation}
-  \textbf{x}^{\mathrm{f}} _{i+1}=M(\textbf{x}^{\mathrm{a}} _i), \tag{SEEKF.1} \label{eq:SEEKF-1}
+  \textbf{x}^{\mathrm{f}} \_{i+1}=M(\textbf{x}^{\mathrm{a}} \_i), \tag{SEEKF.1} \label{eq:SEEKF-1}
   \end{equation}
   \begin{equation}
-  \hat{\textbf{U}} '_{i+1}\approx \textbf{M} \hat{\textbf{U}} _i. \tag{SEEKF.2} \label{eq:SEEKF-2}
+  \hat{\textbf{U}} '\_{i+1}\approx \textbf{M} \hat{\textbf{U}} \_i. \tag{SEEKF.2} \label{eq:SEEKF-2}
   \end{equation}
 
 - Kalman gain (\\(\textbf{K} _i\\)) equation:
