@@ -96,13 +96,13 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
   \hat{\textbf{D}} '_i\approx \hat{\textbf{D}} _{i-1}-\hat{\textbf{D}} _{i-1}(\hat{\textbf{U}}' _i)^T\textbf{H} ^T_i\left[\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}(\hat{\textbf{U}}' _i)^T\textbf{H} ^T_i+\textbf{R} _i \right] ^{-1}\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}, \tag{SEEKF.5} \label{eq:SEEKF-5}
   \end{equation}
   \begin{equation}
-  \hat{\textbf{D}} '_i=\textbf{L} \textbf{L} ^T, \tag{SEEKF.6} \label{eq:SEEKF-6}
+  \hat{\textbf{D}} '_i=\textbf{L} \textbf{L} ^T, \quad (\mathrm{Cholesky\; decomposition}), \tag{SEEKF.6} \label{eq:SEEKF-6}
   \end{equation}
   \begin{equation}
   \textbf{L} ^T(\hat{\textbf{U}} '_i)^T\hat{\textbf{U}} '_i\textbf{L} =\textbf{V} \textbf{E} \textbf{V} ^T, \quad (\mathrm{Eigenvalue\; decomposition}), \tag{SEEKF.7} \label{eq:SEEKF-7}
   \end{equation}
   \begin{equation}
-  \hat{\textbf{U}} _i=\hat{\textbf{U}} '_i\textbf{L} \textbf{V} \textbf{E} ^{-1/2},\quad \hat{\textbf{D}} _i=\textbf{E} . \quad (\mathrm{Eigenvalue\; decomposition}), \tag{SEEKF.8} \label{eq:SEEKF-8}
+  \hat{\textbf{U}} _i=\hat{\textbf{U}} '_i\textbf{L} \textbf{V} \textbf{E} ^{-1/2},\quad \hat{\textbf{D}} _i=\textbf{E} . \tag{SEEKF.8} \label{eq:SEEKF-8}
   \end{equation}
 
 - Symbols
