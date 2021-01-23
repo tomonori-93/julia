@@ -18,17 +18,16 @@ using Statistics
 
 rng = MersenneTwister(1234)
 
-rng = MersenneTwister(1234)
-
 nt = 20000
 nx = 40
 no = 40
-nex = 78  # ensemble member
+nex = 39  # ensemble member
 n_ascyc = 5  # assimilation cycle interval for "t"
 fact_1day = 0.2  # Time for 1 day
 rand_flag = true  # observation including random noise
 nto = div(nt,n_ascyc) + 1
-inf_fact = 1.5  # inflation factor
+inf_fact = 0.75  # inflation factor
+inf_type = 3    # inflation type (1: Multiplicative inflation, 3: Relaxation to prior)
 nspin = 10000  # spin-up steps
 
 # Allocating
@@ -37,7 +36,7 @@ t_o = zeros(nto)
 y_o = reshape(zeros(no,nto),no,nto)
 x_t = reshape(zeros(nx,nt),nx,nt)
 x_spin = reshape(zeros(nx,nspin),nx,nspin)
-x_f = reshape(zeros(nx,nt),nx,nt)
+x_f = reshape(zeros(nx,nt),nx,nt)  # ensemble mean
 Xen = reshape(zeros(nx,nex),nx,nex)
 X_an = reshape(zeros(nx,nex),nx,nex)
 dXen = reshape(zeros(nx,nex),nx,nex)
@@ -98,17 +97,26 @@ for i in 1:nx
 end
 
 # make ensemble members
+#-- (OPT1) only positive
 Mop = L96_RK4_tangent(x_f[1:nx,1],dt,F,nx)
 lambda = eigen(Symmetric(Mop*Mop'),1:nx)
-for i in 1:div(nex,2)
+for i in 1:nex
     Xen[1:nx,i] = x_f[1:nx,1] + lambda.vectors[1:nx,nx - i + 1]
-    Xen[1:nx,nex - i + 1] = x_f[1:nx,1] - lambda.vectors[1:nx,nx - i + 1]
 end
+#-- (OPT2) both positive and negative
+#for i in 1:div(nex,2)
+#    Xen[1:nx,i] = x_f[1:nx,1] + lambda.vectors[1:nx,nx - i + 1]
+#    Xen[1:nx,nex - i + 1] = x_f[1:nx,1] - lambda.vectors[1:nx,nx - i + 1]
+#end
 
 draw_Xen[1:nex,1] = Xen[1,1:nex]
 # Main assimilation-prediction cycle
 
-Pftime[1:nx,1:nx,1] = Pf
+Pftime[1:nx,1:nx,1] = Get_ensemble_covariance(Xen,nx,nex)
+
+if inf_type == 3 && (inf_fact < 0.0 || inf_fact > 1.0)
+    println("WARNING (main): set 0 <= alpha <= 1.")
+end
 
 for i in 1:nt-1
     if mod(i-1,n_ascyc) == 0  # Entering the analysis processes
@@ -139,7 +147,11 @@ for i in 1:nt-1
             Yo[j,1:nex] = fill(y_o[j,div(i-1,n_ascyc)+1],1,nex)
         end
         d_innov = Yo - HXmean
-        X_an = Xfmean + inf_fact .* ( Kg * d_innov + dXen * Tm )
+        if inf_type == 1  # Multiplicative inflation
+            X_an = Xfmean + inf_fact .* ( Kg * d_innov + dXen * Tm )
+        elseif inf_type == 3  # Relaxation to prior
+            X_an = Xfmean + inf_fact .* (dXen) + (1.0 - inf_fact) .* ( Kg * d_innov + dXen * Tm )
+        end
         #x_inc[1:nx,div(i-1,n_ascyc)+1] = x_an - x_f[1:nx,i]
         t_o[div(i-1,n_ascyc)+1] = dt*(i-1)
         
@@ -158,15 +170,15 @@ for i in 1:nt-1
     x_f[1:nx,i+1] = En_mean(Xen,nx,nex)[1:nx,1]
     draw_Xen[1:nex,i+1] = Xen[1,1:nex]
 
-    #Egftime[i+1] = tr(Uf * Df * Uf') / nx
-    #Egtime[i+1] = tr(Ua * Da * Ua') / nx
+    Egftime[i+1] = tr(Get_ensemble_covariance(Xen,nx,nex)) / nx
+    Egtime[i+1] = tr(Get_ensemble_covariance(X_an,nx,nex)) / nx
     delta_x = x_f[1:nx,i+1] - x_t[1:nx,i+1]
     L2Ntime[i+1] = sqrt((delta_x' * delta_x) / nx)
     
 end
 t[nt] = t[nt-1] + dt
 
-#Pftime[1:nx,1:nx,2] = Pf
+Pftime[1:nx,1:nx,2] = Get_ensemble_covariance(Xen,nx,nex)
 
 #-- Drawing
 ##########
@@ -175,13 +187,14 @@ t[nt] = t[nt-1] + dt
 using PyPlot
 fig = figure("pyplot_majorminor",figsize=(7,5))
 
-draw_num = 1
+draw_num = 3
 if draw_num == 1  # X-time
     p = plot(5.0.*t[1:200],draw_Xen[1,1:200],color="red",label="Ensemble")
     for i in 2:nex
         p = plot(5.0.*t[1:200],draw_Xen[i,1:200],color="red")
     end
     p = plot(5.0.*t[1:200],x_t[1,1:200],color="black",label="Perfect")
+    p = plot(5.0.*t[1:200],x_f[1,1:200],color="blue",label="Ens. mean")
     p = plot(5.0.*t_o[1:div(200-1,n_ascyc)+1],y_o[1,1:div(200-1,n_ascyc)+1],linestyle="",marker="o",color="black",label="Obs")
     #p = plot(5.0.*t[1:nt],x_f[1,1:nt],color="red",label="Assim")
     #p = plot(5.0.*t[1:nt],Egtime[1:nt],color="green",label="Tr(Pa)")
@@ -196,8 +209,8 @@ elseif draw_num == 2  # X-Z phase
     
 elseif draw_num == 3  # error-time
 #    p = plot(5.0.*t[1:nt],Egftime[1:nt],color="black",label="Tr(Pf)")
-    p = plot(5.0.*t[1:nt],Egtime[1:nt],color="blue",label="Tr(Pa)")
     p = plot(5.0.*t[1:nt],L2Ntime[1:nt],color="red",label="RMSE(x-xt)")
+    p = plot(5.0.*t[1:nt],Egtime[1:nt],color="blue",label="Tr(Pa)/N")
 #    p = plot(5.0.*t_o[1:div(nt-1,n_ascyc)+1],L2Natime[1:div(nt-1,n_ascyc)+1,1],color="blue",label="RMSE(xa-xt)")
     p = plot(5.0.*t_o[1:div(nt-1,n_ascyc)+1],fill(0.0,div(nt-1,n_ascyc)+1),linestyle="",marker="o",color="black",label="Obs")
 #    p = plot(t[1:nt],lam_max[1:nt],color="green",label="Lambda_max")
@@ -217,7 +230,7 @@ elseif draw_num == 2  # X-Z phase
     
 elseif draw_num == 3  # error-time
     xlabel("Time (days)")
-    ylabel("ΔX")
+    ylabel("RMSE and Tr(Pa)/N")
 
 end
     
@@ -285,11 +298,12 @@ end
 rc("font", family="IPAPGothic")
 fig = figure("pyplot_majorminor",figsize=(7,5))
 
-draw_num2 = 2
+draw_num2 = 1
 if draw_num2 == 1
     #cp = contourf(xax[1:nx,1:nx], xax'[1:nx,1:nx], Pftime[1:nx,1:nx,1], levels=[-15.0, -10.0, -5.0, 0.0, 5.0, 10.0, 15.0, 20.0], origin="image", cmap=ColorMap("viridis"), extend="both")
     #cp = contourf(xax[1:nx,1:nx], xax'[1:nx,1:nx], Pftime[1:nx,1:nx,2], levels=[-2.0, -1.0, -0.5, -0.25, 0.25, 0.5, 1.0, 1.5, 2.0], origin="image", cmap=ColorMap("viridis"), extend="both")
-    cp = contourf(xax[1:nx,1:no], xax'[1:nx,1:no], Pftime[1:nx,1:nx,2]*Hop'*inv(Hop*Pftime[1:nx,1:nx,2]*Hop'+Ro), origin="image", cmap=ColorMap("viridis"), extend="both")
+    cp = contourf(xax[1:nx,1:nx], xax'[1:nx,1:nx], Pftime[1:nx,1:nx,2], origin="image", cmap=ColorMap("viridis"), extend="both")
+    #cp = contourf(xax[1:nx,1:no], xax'[1:nx,1:no], Pftime[1:nx,1:nx,2]*Hop'*inv(Hop*Pftime[1:nx,1:nx,2]*Hop'+Ro), origin="image", cmap=ColorMap("viridis"), extend="both")
     #cp = contourf(xax[1:nx,1:nx], xax'[1:nx,1:nx], Pstat[1:nx,1:nx], origin="image", cmap=ColorMap("viridis"), extend="both")
 elseif draw_num2 == 2
     cp = contourf(xax[1:nx,1:nt], tax[1:nx,1:nt], x_f[1:nx,1:nt], 10, levels=[-15.0, -10.0, -5.0, 0.0, 5.0, 10.0, 15.0], cmap=ColorMap("viridis"), extend="both")
