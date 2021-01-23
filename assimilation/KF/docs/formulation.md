@@ -85,15 +85,24 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 
 - Kalman gain (\\(\textbf{K} _i\\)) equation:
   \begin{equation}
-  \textbf{K} _i=\hat{\textbf{U}} '_i\hat{\textbf{D}} '_i\hat{\textbf{U}}' ^T_i \textbf{H} ^T_i\textbf{R} ^{-1}_i. \tag{SEEKF.3} \label{eq:SEEKF-3}
+  \textbf{K} _i=\hat{\textbf{U}} '_i\hat{\textbf{D}} '_i(\hat{\textbf{U}}' _i)^T \textbf{H} ^T_i\textbf{R} ^{-1}_i. \tag{SEEKF.3} \label{eq:SEEKF-3}
   \end{equation}
 
 - Analysis equations: 
   \begin{equation}
-  \textbf{x}^{\mathrm{a}} _i=\textbf{x}^{\mathrm{f}} _i+\textbf{K} _i \left[\textbf{y}^{\mathrm{o}} _i -H_i(\textbf{x}^{\mathrm{f}} _i) \right] . \tag{SEEKF.4} \label{eq:SEEKF-4}
+  \textbf{x}^{\mathrm{a}} _i=\textbf{x}^{\mathrm{f}} _i+\textbf{K} _i \left[\textbf{y}^{\mathrm{o}} _i -H_i(\textbf{x}^{\mathrm{f}} _i) \right] , \tag{SEEKF.4} \label{eq:SEEKF-4}
   \end{equation}
   \begin{equation}
-  \hat{\textbf{D}} '_i\approx \hat{\textbf{D}} _{i-1}-\hat{\textbf{D}} _{i-1}\hat{\textbf{U}}' ^T_i\textbf{H} ^T_i\left(\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}\hat{\textbf{U}}' ^T_i\textbf{H} ^T_i+\textbf{R} _i \right) ^{-1}\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}. \tag{SEEKF.5} \label{eq:SEEKF-5}
+  \hat{\textbf{D}} '_i\approx \hat{\textbf{D}} _{i-1}-\hat{\textbf{D}} _{i-1}(\hat{\textbf{U}}' _i)^T\textbf{H} ^T_i\left[\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}(\hat{\textbf{U}}' _i)^T\textbf{H} ^T_i+\textbf{R} _i \right] ^{-1}\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}, \tag{SEEKF.5} \label{eq:SEEKF-5}
+  \end{equation}
+  \begin{equation}
+  \hat{\textbf{D}} '_i=\textbf{L} \textbf{L} ^T, \tag{SEEKF.6} \label{eq:SEEKF-6}
+  \end{equation}
+  \begin{equation}
+  \textbf{L} ^T(\hat{\textbf{U}} '_i)^T\hat{\textbf{U}} '_i\textbf{L} =\textbf{V} \textbf{E} \textbf{V} ^T, \quad (\mathrm{Eigenvalue\; decomposition}), \tag{SEEKF.7} \label{eq:SEEKF-7}
+  \end{equation}
+  \begin{equation}
+  \hat{\textbf{U}} _i=\hat{\textbf{U}} '_i\textbf{L} \textbf{V} \textbf{E} ^{-1/2},\quad \hat{\textbf{D}} _i=\textbf{E} . \quad (\mathrm{Eigenvalue\; decomposition}), \tag{SEEKF.8} \label{eq:SEEKF-8}
   \end{equation}
 
 - Symbols
