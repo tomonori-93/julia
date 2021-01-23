@@ -19,21 +19,21 @@ The Lorenz96 equation (\ref{eq:exam-3-2-3-1}):
 \dfrac{d\textbf{x}}{dt} =f(t,\textbf{x}),\quad \textbf{x} \equiv (X_1,\cdots ,X_k,\cdots ,X_N)^T \tag{F.1} \label{eq:app-1-1}
 \end{equation}
 is integrated by the standard 4th-order Runge-Kutta scheme: 
-\begin{equation*}
-\textbf{x} _{i+1} =\textbf{x} _i+\dfrac{\Delta t}{6} \left(\textbf{k} _1+2\textbf{k} _2+2\textbf{k} _3+\textbf{k} _4 \right) =M(\textbf{x} _i) ,
-\end{equation*}
-\begin{equation*}
-\textbf{k} _1\equiv f(t_i,\textbf{x} _i) ,
-\end{equation*}
-\begin{equation*}
-\textbf{k} _2\equiv f(t_i+\Delta t/2,\textbf{x} _i+(\Delta t/2)\textbf{k} _1) =f(t^{(2)}_i,\textbf{x} ^{(2)}_i) ,
-\end{equation*}
-\begin{equation*}
-\textbf{k} _3\equiv f(t_i+\Delta t/2,\textbf{x} _i+(\Delta t/2)\textbf{k} _2) =f(t^{(3)}_i,\textbf{x} ^{(3)}_i) ,
-\end{equation*}
-\begin{equation*}
-\textbf{k} _4\equiv f(t_i+\Delta t,\textbf{x} _i+\Delta t\textbf{k} _3) =f(t^{(4)}_i,\textbf{x} ^{(4)}_i) .
-\end{equation*}
+\begin{equation}
+\textbf{x} _{i+1} =\textbf{x} _i+\dfrac{\Delta t}{6} \left(\textbf{k} _1+2\textbf{k} _2+2\textbf{k} _3+\textbf{k} _4 \right) =M(\textbf{x} _i) , \nonumber
+\end{equation}
+\begin{equation}
+\textbf{k} _1\equiv f(t_i,\textbf{x} _i) , \nonumber
+\end{equation}
+\begin{equation}
+\textbf{k} _2\equiv f(t_i+\Delta t/2,\textbf{x} _i+(\Delta t/2)\textbf{k} _1) =f(t^{(2)}_i,\textbf{x} ^{(2)}_i) , \nonumber
+\end{equation}
+\begin{equation}
+\textbf{k} _3\equiv f(t_i+\Delta t/2,\textbf{x} _i+(\Delta t/2)\textbf{k} _2) =f(t^{(3)}_i,\textbf{x} ^{(3)}_i) , \nonumber
+\end{equation}
+\begin{equation}
+\textbf{k} _4\equiv f(t_i+\Delta t,\textbf{x} _i+\Delta t\textbf{k} _3) =f(t^{(4)}_i,\textbf{x} ^{(4)}_i) . \nonumber
+\end{equation}
 
 
 # The data assimilation-forecast cycle in the Kalman Filter
@@ -126,7 +126,7 @@ where \\(\overline{(\; )}\\) means ensemble mean.
 \textbf{X}^{\mathrm{a}} _i=\overline{\textbf{X}} ^{\mathrm{f}} _i+\delta \textbf{X} ^{\mathrm{f}} _i\left[\textbf{U} \textbf{D} ^{-1}\textbf{U} ^T(\textbf{H} _i\delta \textbf{X} ^{\mathrm{f}} _i)^T(\textbf{R} _i)^{-1}(\textbf{Y} ^{\mathrm{o}}_i-\overline{H_i(\textbf{X} ^{\mathrm{f}} _i)} )+\; \sqrt[]{m-1} \textbf{U} \textbf{D} ^{1/2}\textbf{U} ^T \right] , \tag{LETKF.3} \label{eq:LETKF-3}
 \end{equation}
 \begin{equation}
-(m-1)\textbf{I}+(\textbf{H} _i\delta \textbf{X} ^{\mathrm{f}} _i)^T(\textbf{R} _i)^{-1}\textbf{H} _i\delta \textbf{X} ^{\mathrm{f}} _i=\textbf{U} \textbf{D} \textbf{U} ^T, (\mathrm{Eigenvalue decomposition}). \tag{LETKF.4} \label{eq:LETKF-4}
+(m-1)\textbf{I}+(\textbf{H} _i\delta \textbf{X} ^{\mathrm{f}} _i)^T(\textbf{R} _i)^{-1}\textbf{H} _i\delta \textbf{X} ^{\mathrm{f}} _i=\textbf{U} \textbf{D} \textbf{U} ^T, (\mathrm{Eigenvalue\; decomposition}). \tag{LETKF.4} \label{eq:LETKF-4}
 \end{equation}
 
 - Sub equations (Not required in the analysis procedure):
