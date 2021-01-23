@@ -78,25 +78,31 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 
 # The data assimilation-forecast cycle in the Singular Evolutive Extended Kalman Filter (SEEK Filter)
 - Forecast equations:
-\begin{equation}
-\textbf{x}^{\mathrm{f}} _{i+1}=M(\textbf{x}^{\mathrm{a}} _i), \tag{SEEKF.1} \label{eq:SEEKF-1}
-\end{equation}
-\begin{equation}
-\hat{\textbf{U}} '_{i+1}\approx \textbf{M} \hat{\textbf{U}} _i. \tag{SEEKF.2} \label{eq:SEEKF-2}
-\end{equation}
+  \begin{equation}
+  \textbf{x}^{\mathrm{f}} _{i+1}=M(\textbf{x}^{\mathrm{a}} _i), \tag{KF.1} \label{eq:KF-1a}
+  \end{equation}
+  \begin{equation}
+  \textbf{P} ^{\mathrm{f}} _{i+1}\approx \textbf{M} \textbf{P} ^{\mathrm{a}} _i \textbf{M} ^T. \tag{KF.2} \label{eq:KF-2a}
+  \end{equation}
+  \begin{equation}
+  \textbf{x}^{\mathrm{f}} _{i+1}=M(\textbf{x}^{\mathrm{a}} _i), \tag{SEEKF.1} \label{eq:SEEKF-1}
+  \end{equation}
+  \begin{equation}
+  \hat{\textbf{U}} '_{i+1}\approx \textbf{M} \hat{\textbf{U}} _i. \tag{SEEKF.2} \label{eq:SEEKF-2}
+  \end{equation}
 
 - Kalman gain (\\(\textbf{K} _i\\)) equation:
-\begin{equation}
-\textbf{K} _i=\hat{\textbf{U}} '_i\hat{\textbf{D}} '_i\hat{\textbf{U}} ^{'T}_i \textbf{H} ^T_i\textbf{R} ^{-1}_i. \tag{SEEKF.3} \label{eq:SEEKF-3}
-\end{equation}
+  \begin{equation}
+  \textbf{K} _i=\hat{\textbf{U}} '_i\hat{\textbf{D}} '_i\hat{\textbf{U}} ^{'T}_i \textbf{H} ^T_i\textbf{R} ^{-1}_i. \tag{SEEKF.3} \label{eq:SEEKF-3}
+  \end{equation}
 
 - Analysis equations: 
-\begin{equation}
-\textbf{x}^{\mathrm{a}} _i=\textbf{x}^{\mathrm{f}} _i+\textbf{K} _i \left[\textbf{y}^{\mathrm{o}} _i -H_i(\textbf{x}^{\mathrm{f}} _i) \right] . \tag{SEEKF.4} \label{eq:SEEKF-4}
-\end{equation}
-\begin{equation}
-\hat{\textbf{D}} '_i\approx \hat{\textbf{D}} _{i-1}-\hat{\textbf{D}} _{i-1}\hat{\textbf{U}} ^{'T}_i\textbf{H} ^T_i\left(\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}\hat{\textbf{U}} ^{'T}_i\textbf{H} ^T_i+\textbf{R} _i \right) ^{-1}\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}. \tag{SEEKF.5} \label{eq:SEEKF-5}
-\end{equation}
+  \begin{equation}
+  \textbf{x}^{\mathrm{a}} _i=\textbf{x}^{\mathrm{f}} _i+\textbf{K} _i \left[\textbf{y}^{\mathrm{o}} _i -H_i(\textbf{x}^{\mathrm{f}} _i) \right] . \tag{SEEKF.4} \label{eq:SEEKF-4}
+  \end{equation}
+  \begin{equation}
+  \hat{\textbf{D}} '_i\approx \hat{\textbf{D}} _{i-1}-\hat{\textbf{D}} _{i-1}\hat{\textbf{U}} ^{'T}_i\textbf{H} ^T_i\left(\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}\hat{\textbf{U}} ^{'T}_i\textbf{H} ^T_i+\textbf{R} _i \right) ^{-1}\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}. \tag{SEEKF.5} \label{eq:SEEKF-5}
+  \end{equation}
 
 - Symbols
   - \\(\textbf{x}^{\mathrm{f}}\\): Forecast (i.e., first guess) variables (\\(N\\)-dimension vector), 
@@ -113,13 +119,13 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 
 # The data assimilation-forecast cycle in the Local Ensemble Transform Kalman Filter (LETKF)
 - Forecast equations (for each ensemble member, m):
-\begin{equation}
-\textbf{X}^{\mathrm{f}} _{i+1}=M(\textbf{X}^{\mathrm{a}} _i), \tag{LETKF.1} \label{eq:LETKF-1}
-\end{equation}
-\begin{equation}
-\textbf{X}\equiv \left[\textbf{x}^{(1)}|\cdots |\textbf{x}^{(m)} \right] =\overline{\textbf{X}} +\delta \textbf{X} , \tag{LETKF.2} \label{eq:LETKF-2}
-\end{equation}
-where \\(\overline{(\; )}\\) means ensemble mean. 
+  \begin{equation}
+  \textbf{X}^{\mathrm{f}} _{i+1}=M(\textbf{X}^{\mathrm{a}} _i), \tag{LETKF.1} \label{eq:LETKF-1}
+  \end{equation}
+  \begin{equation}
+  \textbf{X}\equiv \left[\textbf{x}^{(1)}|\cdots |\textbf{x}^{(m)} \right] =\overline{\textbf{X}} +\delta \textbf{X} , \tag{LETKF.2} \label{eq:LETKF-2}
+  \end{equation}
+  where \\(\overline{(\; )}\\) means ensemble mean. 
 
 - Analysis equations: 
 \begin{equation}
