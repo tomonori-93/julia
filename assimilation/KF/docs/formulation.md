@@ -165,15 +165,7 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 (Under construction)
 - Background covariance
   \begin{equation}
-  \textbf{P} ^{\mathrm{f}} _i=\beta \textbf{P} _{\mathrm{stat}}+(1-\beta )\textbf{P} ^{\mathrm{f}} _{\mathrm{flow},i}, \quad (0\geq \beta \geq 1). \tag{HEnKF.1} \label{eq:HEnKF-1}
-  \end{equation}
-
-- Analysis equations: 
-  \begin{equation}
-  \textbf{X}^{\mathrm{a}} _i=\overline{\textbf{X}} ^{\mathrm{f}} _i+\delta \textbf{X} ^{\mathrm{f}} _i\left[\textbf{U} \textbf{D} ^{-1}\textbf{U} ^T(\textbf{H} _i\delta \textbf{X} ^{\mathrm{f}} _i)^T(\textbf{R} _i)^{-1}(\textbf{Y} ^{\mathrm{o}}_i-\overline{H_i(\textbf{X} ^{\mathrm{f}} _i)} )+\; \sqrt[]{m-1} \textbf{U} \textbf{D} ^{1/2}\textbf{U} ^T \right] , \tag{LETKF.3} \label{eq:LETKF-3}
-  \end{equation}
-  \begin{equation}
-  (m-1)\textbf{I}+(\textbf{H} _i\delta \textbf{X} ^{\mathrm{f}} _i)^T(\textbf{R} _i)^{-1}\textbf{H} _i\delta \textbf{X} ^{\mathrm{f}} _i=\textbf{U} \textbf{D} \textbf{U} ^T, \qquad (\mathrm{Eigenvalue\; decomposition}). \tag{LETKF.4} \label{eq:LETKF-4}
+  \textbf{P} ^{\mathrm{f}} _i=\beta \textbf{P} _{\mathrm{stat}}+(1-\beta )\textbf{P} ^{\mathrm{f}} _{\mathrm{flow},i}, \quad (0\leq \beta \leq 1). \tag{HEnKF.1} \label{eq:HEnKF-1}
   \end{equation}
 
 - Symbols
