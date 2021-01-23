@@ -95,7 +95,7 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
   \textbf{x}^{\mathrm{a}} _i=\textbf{x}^{\mathrm{f}} _i+\textbf{K} _i \left[\textbf{y}^{\mathrm{o}} _i -H_i(\textbf{x}^{\mathrm{f}} _i) \right] . \tag{SEEKF.4} \label{eq:SEEKF-4}
   \end{equation}
   \begin{equation}
-  \hat{\textbf{D}} '_i\approx \hat{\textbf{D}} _{i-1}-\hat{\textbf{D}} _{i-1}\hat{\textbf{U}} ^{'T}_i\textbf{H} ^T_i\left(\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}\hat{\textbf{U}} ^{'T}_i\textbf{H} ^T_i+\textbf{R} _i \right) ^{-1}\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}. \tag{SEEKF.5} \label{eq:SEEKF-5}
+  \hat{\textbf{D}} '_i\approx \hat{\textbf{D}} _{i-1}-\hat{\textbf{D}} _{i-1}\hat{\textbf{U}}' ^T_i\textbf{H} ^T_i\left(\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}\hat{\textbf{U}}' ^T_i\textbf{H} ^T_i+\textbf{R} _i \right) ^{-1}\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}. \tag{SEEKF.5} \label{eq:SEEKF-5}
   \end{equation}
 
 - Symbols
@@ -131,7 +131,7 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 
 - Sub equations (Not required in the analysis procedure):
   \begin{equation}
-  \textbf{K} _i=\textbf{P} ^{\mathrm{f}} _i \textbf{H} ^T_i\left(\textbf{H} _i \textbf{P} ^{\mathrm{f}} _i \textbf{H} ^T_i+\textbf{R} _i \right) ^{-1}. \tag{LETKF.5} \label{eq:LETKF-5}
+  \textbf{K} _i=\delta \textbf{X} ^{\mathrm{f}} _i\textbf{U} \textbf{D} ^{-1}\textbf{U} ^T(\textbf{H} _i\delta \textbf{X} ^{\mathrm{f}} _i)^T(\textbf{R} _i)^{-1} . \tag{LETKF.5} \label{eq:LETKF-5}
   \end{equation}
   \begin{equation}
   \textbf{P} \equiv \dfrac{1}{m-1} (\delta \textbf{X} )(\delta \textbf{X} )^T. \tag{LETKF.6} \label{eq:LETKF-6}
@@ -150,4 +150,5 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
   - \\(M\\): Model operator for time integration (linear or non-linear), 
   - \\(H\\): Observation operator (linear or non-linear), 
   - \\(\textbf{H} \equiv \partial H/\partial \textbf{x} \\): Tangent linear operator corresponding to the Observation operator (\\(p\times N\\)), 
+  - \\(m\\): Total ensemble member.
 
