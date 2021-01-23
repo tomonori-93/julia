@@ -26,13 +26,13 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 \textbf{k} _1\equiv f(t_i,\textbf{x} _i) , \nonumber
 \end{equation}
 \begin{equation}
-\textbf{k} _2\equiv f(t_i+\Delta t/2,\textbf{x} _i+(\Delta t/2)\textbf{k} _1) =f(t^{(2)}_i,\textbf{x} ^{(2)}_i) , \nonumber
+\textbf{k} _2\equiv f(t_i+\Delta t/2,\textbf{x} _i+(\Delta t/2)\textbf{k} _1) , \nonumber
 \end{equation}
 \begin{equation}
-\textbf{k} _3\equiv f(t_i+\Delta t/2,\textbf{x} _i+(\Delta t/2)\textbf{k} _2) =f(t^{(3)}_i,\textbf{x} ^{(3)}_i) , \nonumber
+\textbf{k} _3\equiv f(t_i+\Delta t/2,\textbf{x} _i+(\Delta t/2)\textbf{k} _2) , \nonumber
 \end{equation}
 \begin{equation}
-\textbf{k} _4\equiv f(t_i+\Delta t,\textbf{x} _i+\Delta t\textbf{k} _3) =f(t^{(4)}_i,\textbf{x} ^{(4)}_i) . \nonumber
+\textbf{k} _4\equiv f(t_i+\Delta t,\textbf{x} _i+\Delta t\textbf{k} _3) . \nonumber
 \end{equation}
 
 
@@ -60,7 +60,7 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 
 - Covariance inflation: 
 \begin{equation}
-\textbf{P}^{\mathrm{a}} _i\leftarrow (1+\Delta )\textbf{P}^{\mathrm{a}} ,\quad (0<\Delta ). \tag{KF.6} \label{eq:KF-6}
+\textbf{P}^{\mathrm{a}} _i\leftarrow (1+\Delta )\textbf{P}^{\mathrm{a}} _i,\quad (0<\Delta ). \tag{KF.6} \label{eq:KF-6}
 \end{equation}
 
 - Symbols
@@ -139,7 +139,7 @@ where \\(\overline{(\; )}\\) means ensemble mean.
 
 - Covariance inflation (Multiplicative inflation): 
 \begin{equation}
-\delta \textbf{X}^{\mathrm{a}} _i\leftarrow (1+\Delta )\delta \textbf{X}^{\mathrm{a}} ,\quad (0<\Delta ). \tag{LETKF.7} \label{eq:LETKF-7}
+\delta \textbf{X}^{\mathrm{a}} _i\leftarrow (1+\Delta )\delta \textbf{X}^{\mathrm{a}} _i,\quad (0<\Delta ). \tag{LETKF.7} \label{eq:LETKF-7}
 \end{equation}
 
 - Symbols
