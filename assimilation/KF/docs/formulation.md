@@ -1,7 +1,5 @@
 <script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS_CHTML"></script>
 
-(Under construction...)
-
 # Basic equation in Lorenz (1996)
 The basic equation in Lorenz (1996) is expressed as: 
 \begin{equation}
@@ -77,7 +75,7 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 
 
 # The data assimilation-forecast cycle in the Singular Evolutive Extended Kalman Filter (SEEK Filter)
-- Forecast equations (Under construction):
+- Forecast equations:
   \begin{equation}
   \textbf{x}^{\mathrm{f}} \_{i+1}=M(\textbf{x}^{\mathrm{a}} \_i), \tag{SEEKF.1} \label{eq:SEEKF-1}
   \end{equation}
@@ -87,7 +85,7 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 
 - Kalman gain (\\(\textbf{K} _i\\)) equation:
   \begin{equation}
-  \textbf{K} _i=\hat{\textbf{U}} '_i\hat{\textbf{D}} '_i\hat{\textbf{U}} ^{'T}_i \textbf{H} ^T_i\textbf{R} ^{-1}_i. \tag{SEEKF.3} \label{eq:SEEKF-3}
+  \textbf{K} _i=\hat{\textbf{U}} '_i\hat{\textbf{D}} '_i\hat{\textbf{U}}' ^T_i \textbf{H} ^T_i\textbf{R} ^{-1}_i. \tag{SEEKF.3} \label{eq:SEEKF-3}
   \end{equation}
 
 - Analysis equations: 
