@@ -58,9 +58,9 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 \textbf{P} ^{\mathrm{a}} _i=\left(\textbf{I} -\textbf{K} _i\textbf{H} _i \right) \textbf{P} ^{\mathrm{f}} _i. \tag{KF.5} \label{eq:KF-5}
 \end{equation}
 
-- Covariance inflation (Multiplicative inflation): 
+- Covariance inflation: 
 \begin{equation}
-\textbf{P}^{\mathrm{a}} _i=(1+\Delta )\textbf{P}^{\mathrm{a}} ,\quad (0<\Delta ). \tag{KF.6} \label{eq:KF-6}
+\textbf{P}^{\mathrm{a}} _i\leftarrow (1+\Delta )\textbf{P}^{\mathrm{a}} ,\quad (0<\Delta ). \tag{KF.6} \label{eq:KF-6}
 \end{equation}
 
 - Symbols
@@ -76,26 +76,26 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
   - \\(\textbf{H} \equiv \partial H/\partial \textbf{x} \\): Tangent linear operator corresponding to the Observation operator (\\(p\times N\\)), 
 
 
-# The data assimilation-forecast cycle in the Kalman Filter
+# The data assimilation-forecast cycle in the Singular Evolutive Extended Kalman Filter (SEEK Filter)
 - Forecast equations:
 \begin{equation}
-\textbf{x}^{\mathrm{f}} _{i+1}=M(\textbf{x}^{\mathrm{a}} _i), \tag{KF.1} \label{eq:KF-1}
+\textbf{x}^{\mathrm{f}} _{i+1}=M(\textbf{x}^{\mathrm{a}} _i), \tag{SEEKF.1} \label{eq:SEEKF-1}
 \end{equation}
 \begin{equation}
-\textbf{P} ^{\mathrm{f}} _{i+1}\approx \textbf{M} \textbf{P} ^{\mathrm{a}} _i \textbf{M} ^T. \tag{KF.2} \label{eq:KF-2}
+\hat{\textbf{U}} '_{i+1}\approx \textbf{M} \hat{\textbf{U}} _i. \tag{SEEKF.2} \label{eq:SEEKF-2}
 \end{equation}
 
 - Kalman gain (\\(\textbf{K} _i\\)) equation:
 \begin{equation}
-\textbf{K} _i=\textbf{P} ^{\mathrm{f}} _i \textbf{H} ^T_i\left(\textbf{H} _i \textbf{P} ^{\mathrm{f}} _i \textbf{H} ^T_i+\textbf{R} _i \right) ^{-1}. \tag{KF.3} \label{eq:KF-3}
+\textbf{K} _i=\hat{\textbf{U}} '_i\hat{\textbf{D}} '_i\hat{\textbf{U}} ^{'T}_i \textbf{H} ^T_i\textbf{R} ^{-1}_i. \tag{SEEKF.3} \label{eq:SEEKF-3}
 \end{equation}
 
 - Analysis equations: 
 \begin{equation}
-\textbf{x}^{\mathrm{a}} _i=\textbf{x}^{\mathrm{f}} _i+\textbf{K} _i \left[\textbf{y}^{\mathrm{o}} _i -H_i(\textbf{x}^{\mathrm{f}} _i) \right] . \tag{KF.4} \label{eq:KF-4}
+\textbf{x}^{\mathrm{a}} _i=\textbf{x}^{\mathrm{f}} _i+\textbf{K} _i \left[\textbf{y}^{\mathrm{o}} _i -H_i(\textbf{x}^{\mathrm{f}} _i) \right] . \tag{SEEKF.4} \label{eq:SEEKF-4}
 \end{equation}
 \begin{equation}
-\textbf{P} ^{\mathrm{a}} _i=\left(\textbf{I} -\textbf{K} _i\textbf{H} _i \right) \textbf{P} ^{\mathrm{f}} _i. \tag{KF.5} \label{eq:KF-5}
+\hat{\textbf{D}} '_i\approx \hat{\textbf{D}} _{i-1}-\hat{\textbf{D}} _{i-1}\hat{\textbf{U}} ^{'T}_i\textbf{H} ^T_i\left(\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}\hat{\textbf{U}} ^{'T}_i\textbf{H} ^T_i+\textbf{R} _i \right) ^{-1}\textbf{H} _i\hat{\textbf{U}} '_i\hat{\textbf{D}} _{i-1}. \tag{SEEKF.5} \label{eq:SEEKF-5}
 \end{equation}
 
 - Symbols
@@ -126,7 +126,7 @@ where \\(\overline{(\; )}\\) means ensemble mean.
 \textbf{X}^{\mathrm{a}} _i=\overline{\textbf{X}} ^{\mathrm{f}} _i+\delta \textbf{X} ^{\mathrm{f}} _i\left[\textbf{U} \textbf{D} ^{-1}\textbf{U} ^T(\textbf{H} _i\delta \textbf{X} ^{\mathrm{f}} _i)^T(\textbf{R} _i)^{-1}(\textbf{Y} ^{\mathrm{o}}_i-\overline{H_i(\textbf{X} ^{\mathrm{f}} _i)} )+\; \sqrt[]{m-1} \textbf{U} \textbf{D} ^{1/2}\textbf{U} ^T \right] , \tag{LETKF.3} \label{eq:LETKF-3}
 \end{equation}
 \begin{equation}
-(m-1)\textbf{I}+(\textbf{H} _i\delta \textbf{X} ^{\mathrm{f}} _i)^T(\textbf{R} _i)^{-1}\textbf{H} _i\delta \textbf{X} ^{\mathrm{f}} _i=\textbf{U} \textbf{D} \textbf{U} ^T, (\mathrm{Eigenvalue\; decomposition}). \tag{LETKF.4} \label{eq:LETKF-4}
+(m-1)\textbf{I}+(\textbf{H} _i\delta \textbf{X} ^{\mathrm{f}} _i)^T(\textbf{R} _i)^{-1}\textbf{H} _i\delta \textbf{X} ^{\mathrm{f}} _i=\textbf{U} \textbf{D} \textbf{U} ^T, \qquad (\mathrm{Eigenvalue\; decomposition}). \tag{LETKF.4} \label{eq:LETKF-4}
 \end{equation}
 
 - Sub equations (Not required in the analysis procedure):
@@ -135,6 +135,11 @@ where \\(\overline{(\; )}\\) means ensemble mean.
 \end{equation}
 \begin{equation}
 \textbf{P} \equiv \dfrac{1}{m-1} (\delta \textbf{X} )(\delta \textbf{X} )^T. \tag{LETKF.6} \label{eq:LETKF-6}
+\end{equation}
+
+- Covariance inflation (Multiplicative inflation): 
+\begin{equation}
+\delta \textbf{X}^{\mathrm{a}} _i\leftarrow (1+\Delta )\delta \textbf{X}^{\mathrm{a}} ,\quad (0<\Delta ). \tag{LETKF.7} \label{eq:LETKF-7}
 \end{equation}
 
 - Symbols
