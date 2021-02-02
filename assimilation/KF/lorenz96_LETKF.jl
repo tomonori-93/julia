@@ -1,7 +1,7 @@
 # Data assimilation simulation with the LETKF in Lorenz (1996) model.
 # Author: Satoki Tsujino (satoki_at_gfd-dennou.org)
 # Date: 2020/12/20
-# Modification: 
+# Modification: 2021/02/02
 # License: LGPL2.1
 ###########################
 # calculation (main) part #
@@ -21,14 +21,16 @@ rng = MersenneTwister(1234)
 nt = 20000
 nx = 40
 no = 40
-nex = 39  # ensemble member
+nex = 120  # ensemble member
 n_ascyc = 5  # assimilation cycle interval for "t"
 fact_1day = 0.2  # Time for 1 day
 rand_flag = true  # observation including random noise
 nto = div(nt,n_ascyc) + 1
-inf_fact = 0.75  # inflation factor
-inf_type = 3    # inflation type (1: Multiplicative inflation, 3: Relaxation to prior)
+inf_fact = 1.5  # inflation factor
+inf_type = 1    # inflation type (1: Multiplicative inflation, 3: Relaxation to prior)
+iniens_fact = 1.0  # initial amplitude of the ensemble perturbation
 nspin = 10000  # spin-up steps
+ens_type = 2   # Ensemble generation type (1: eigenvalue decomp., 2: randomly normal distribution without any correlation)
 
 # Allocating
 t = zeros(nt)
@@ -97,11 +99,24 @@ for i in 1:nx
 end
 
 # make ensemble members
-#-- (OPT1) only positive
-Mop = L96_RK4_tangent(x_f[1:nx,1],dt,F,nx)
-lambda = eigen(Symmetric(Mop*Mop'),1:nx)
-for i in 1:nex
-    Xen[1:nx,i] = x_f[1:nx,1] + lambda.vectors[1:nx,nx - i + 1]
+if ens_type == 1
+    #-- (OPT1) only positive
+    println("Ensemble generation by eigenvalue decomposition...")
+    if nex > nx
+        println("ERROR: ensemble member must be less than N.")
+    end
+    Mop = L96_RK4_tangent(x_f[1:nx,1],dt,F,nx)
+    lambda = eigen(Symmetric(Mop*Mop'),1:nx)
+    for i in 1:nex
+        Xen[1:nx,i] = x_f[1:nx,1] + iniens_fact .* lambda.vectors[1:nx,nx - i + 1]
+    end
+elseif ens_type == 2
+    println("Ensemble generation by randomly normal distribution without any correlation...")
+    for j in 1:nx
+        for i in 1:nex
+            Xen[j,i] = x_f[j,1] + iniens_fact * randn(rng, Float64)
+        end
+    end
 end
 #-- (OPT2) both positive and negative
 #for i in 1:div(nex,2)
@@ -110,10 +125,11 @@ end
 #end
 
 draw_Xen[1:nex,1] = Xen[1,1:nex]
-# Main assimilation-prediction cycle
+Egftime[1] = tr(Get_ensemble_covariance(Xen,nx,nex)) / nx
 
 Pftime[1:nx,1:nx,1] = Get_ensemble_covariance(Xen,nx,nex)
 
+# Main assimilation-prediction cycle
 if inf_type == 3 && (inf_fact < 0.0 || inf_fact > 1.0)
     println("WARNING (main): set 0 <= alpha <= 1.")
 end
@@ -179,7 +195,6 @@ end
 t[nt] = t[nt-1] + dt
 
 Pftime[1:nx,1:nx,2] = Get_ensemble_covariance(Xen,nx,nex)
-
 #-- Drawing
 ##########
 #  Plot  #
