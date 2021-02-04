@@ -39,7 +39,7 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
   * Initial condition: \\(\textbf{x}^{\mathrm{s}}_0=\left[1.1,\; 1.0,\; \cdots ,\; 1.0 \right] ^T \\)
   * Time integration: \\(N_s\\) steps (for sufficiently long period)
 * Perfect model experiment (\\(\textbf{x}^{\mathrm{t}}_i\\))
-  * Initial condition: \\( \textbf{x}^{\mathrm{t}}_0=\textbf{x}^{\mathrm{s}}_{N_s} \\)
+  * Initial condition: \\(\textbf{x}^{\mathrm{t}}_0=\textbf{x}^{\mathrm{s}}_N \\)
   * Time integration: \\(N_t\\) steps
 * Forecast model experiment (\\(\textbf{x}^{\mathrm{f}}_i\\))
   * Initial condition: Temporal average of \\(\textbf{x}^{\mathrm{s}} \\) for a period of 0 to \\(N_s\\)
