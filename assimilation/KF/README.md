@@ -9,6 +9,8 @@ Module script: Basic functions for EnKF (Ensemble Kalman Filter)
 Module script: Functions of functions to solve the nonlinear model in Lorenz (1996)
 
 # Scripts
+**Note**: Tests of these scripts have been done on Jupyter-notebook with Julia-1.1.0. 
+
 ## lorenz96.jl
 EKF (Extended Kalman Filter) data assimilation system for the nonlinear model in Lorenz (1996)
 
