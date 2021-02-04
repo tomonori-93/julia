@@ -35,11 +35,17 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 
 
 # Initialization and configuration of an observation system simulation experiment (OSSE)
-* Spin-up experiment:
-  * Initial condition: \\(\textbf{\textit{x}} ^{\mathrm{s}}_0=\left[1.1,\; 1.0,\; \cdots ,\; 1.0 \right] ^T \\)
-  * Time integration: \\(N_s\\) steps (for sufficiently long period). 
-* Perfect model experiment (\\(\textbf{x} ^{\mathrm{t}}\\))
-* Pseudo-observation: 
+* Spin-up experiment
+  * Initial condition: \\(\textbf{x} ^{\mathrm{s}}_0=\left[1.1,\; 1.0,\; \cdots ,\; 1.0 \right] ^T \\)
+  * Time integration: \\(N_s\\) steps (for sufficiently long period)
+* Perfect model experiment (\\(\textbf{x} ^{\mathrm{t}}_i\\))
+  * Initial condition: \\(\textbf{x} ^{\mathrm{t}} _0=\textbf{x} ^{\mathrm{s}}_{N_s}\\)
+  * Time integration: \\(N_t\\) steps
+* Pseudo-observation (\\(\textbf{y} ^{\mathrm{o}}_i\\))
+  * Observation grids are located at model grids (without any interpolations)
+  * (\\(\textbf{y} ^{\mathrm{o}}_i=\textbf{x} ^{\mathrm{t}} _i+\textbf{r} \\))
+    * \\(\textbf{r} \\) is composed of random perturbations with a normal distribution (\\(N(0, \sigma _R)\\))
+    * \\(\sigma _R \\) is standard deviations of observation
 
 
 # The data assimilation-forecast cycles
@@ -169,7 +175,7 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
   * \\(m\\): Total ensemble member.
 
 
-# A hybrid Ensemble Kalman Filter (EnKF)
+## A hybrid Ensemble Kalman Filter (EnKF)
 
 (Under construction)
 * Background covariance
