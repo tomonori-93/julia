@@ -35,7 +35,7 @@ is integrated by the standard 4th-order Runge-Kutta scheme:
 
 
 # Initialization and configuration of an observation system simulation experiment (OSSE)
-* Spin-up experiment
+* Spin-up experiment (required by making initial conditions for the perfect and forecast models)
   * Initial condition: \\(\textbf{x} ^{\mathrm{s}}_0=\left[1.1,\; 1.0,\; \cdots ,\; 1.0 \right] ^T \\)
   * Time integration: \\(N_s\\) steps (for sufficiently long period)
 * Perfect model experiment (\\(\textbf{x} ^{\mathrm{t}}_i\\))
