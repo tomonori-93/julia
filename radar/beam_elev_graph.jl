@@ -15,6 +15,11 @@ h_radar = 350.0  # the above surface level [m] of the radar
 rl = reshape(collect(Float32, 0.0:dr:dr*(nr-1)),nr,1)  # radar line
 I_nr = reshape(fill(1.0,nr),nr,1)  # dummy vector for nr
 I_na = reshape(fill(1.0,na),na,1)  # dummy vector for na
+x = reshape(zeros(nr,na),nr,na)
+y = reshape(zeros(nr,na),nr,na)
+r = reshape(zeros(nr,na),nr,na)
+z = reshape(zeros(nr,na),nr,na)
+theta = reshape(zeros(nr,na),nr,na)
 rl_mat = rl * I_na'  # = rl(nr,na)
 phi_mat = I_nr * phi'   # = phi(nr,na)
 
