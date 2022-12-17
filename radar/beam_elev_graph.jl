@@ -1,5 +1,5 @@
 #-- Constants
-rad_e = 6380.0e3  # Earth radius (in equator) [m]
+rad_e = 6.371e6  # Earth radius (in meridional) [m]
 d2r = π / 180.0  # degree to radian
 r2d = 180.0 / π  # radian to degree
 
