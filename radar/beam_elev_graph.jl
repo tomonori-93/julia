@@ -47,7 +47,7 @@ fig = figure("pyplot_majorminor",figsize=(7,5))
 
 ax = gca()
 
-xlabel("Radius (km)")
+xlabel("Distance (km)")
 ylabel("Height (km)")
 #plt.colorbar(cp)
 grid("on")
