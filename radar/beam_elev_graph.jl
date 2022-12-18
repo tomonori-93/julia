@@ -8,7 +8,7 @@ nr = 100  # sampling number in radius
 dr = 2.0e3  # sampling grid interval in radius [m]
 na = 14   # number of the elevation angle
 phi = reshape([ 0.0 0.1 0.3 0.5 0.7 1.0 2.0 3.0 4.0 5.0 10.0 15.0 20.0 25.0 ],na,1)  # elevation angles [degree]
-lidx = [ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ]  # line indices for each radar beam
+#lidx = [ 1 1 1 1 1 1 1 1 1 1 1 1 1 1 ]  # line indices for each radar beam
 h_radar = 350.0  # the above surface level [m] of the radar
 
 #--- Initialize
@@ -57,7 +57,8 @@ ylim(0.0,10.0e3*dfact)
 
 PyPlot.title("Radar beams")
 
-plot(r.*dfact,z.*dfact)
+plot(r.*dfact,z.*dfact)  # All beams
+plot(r[:,1].*dfact,z[:,1].*dfact,color="b")  # The lowest elevation angle
 
 fig.canvas.draw() # Update the figure
 gcf() # Needed for IJulia to plot inline
